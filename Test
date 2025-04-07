@@ -20,4 +20,9 @@ def dart_counter():
 
 if __name__ == "__main__":
     dart_counter()
-    
+   
+    play_again = input("Do you want to play again? (yes/no): ").strip().lower()
+    if play_again == "yes":
+        dart_counter()
+    else:
+        print("Thank you for playing! Goodbye!")
