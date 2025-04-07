@@ -1,0 +1,22 @@
+def dart_counter():
+    print("Welcome to Dart Counter!")
+    total_points = int(input("Enter the starting total points: "))
+    
+    while total_points > 0:
+        try:
+            shot_points = int(input("Enter points scored in this shot: "))
+            if shot_points < 0:
+                print("Points cannot be negative. Try again.")
+                continue
+            total_points -= shot_points
+            if total_points > 0:
+                print(f"Remaining points: {total_points}")
+            elif total_points == 0:
+                print("Congratulations! You've hit exactly zero!")
+            else:
+                print(f"Oops! You've gone below zero by {-total_points} points.")
+        except ValueError:
+            print("Invalid input. Please enter a valid number.")
+
+if __name__ == "__main__":
+    dart_counter()
