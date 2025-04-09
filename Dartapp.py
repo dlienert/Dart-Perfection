@@ -2,6 +2,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import json
 import os
+import hashlib
 
 st.set_page_config(page_title="Darts Counter", page_icon="🎯")
 
@@ -18,6 +19,9 @@ def save_users(users):
     with open(USER_DATA_FILE, "w") as f:
         json.dump(users, f, indent=4)
 
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
 users = load_users()
 
 st.title("🔐 Login to Darts Counter")
@@ -32,10 +36,10 @@ if not st.session_state.logged_in:
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
         if st.button("Login"):
-            if username in users and users[username]["password"] == password:
+            if username in users and users[username]["password"] == hash_password(password):
                 st.session_state.logged_in = True
                 st.session_state.username = username
-                st.success(f"Welcome back, {username}!")
+                st.markdown(f"👋 Welcome, **{st.session_state.username}**!")
                 st.rerun()
             else:
                 st.error("Invalid username or password.")
@@ -48,14 +52,20 @@ if not st.session_state.logged_in:
             elif new_username.strip() == "":
                 st.warning("Username cannot be empty.")
             else:
-                users[new_username] = {"password": new_password, "games": []}
+                users[new_username] = {"password": hash_password(new_password), "games": []}
                 save_users(users)
                 st.success("Registration successful! Please log in.")
 
 if not st.session_state.logged_in:
     st.stop()
 
-st.title("🎯 Darts Score Counter")
+col1, col2 = st.columns([8, 1])
+with col1:
+    st.title("🎯 Darts Score Counter")
+with col2:
+    if st.button("🚪 Logout"):
+        st.session_state.clear()
+        st.rerun()
 
 # Game mode selector
 game_mode = st.selectbox("Choose Game Mode:", [301, 501])
@@ -66,6 +76,17 @@ if "starting_score" not in st.session_state or st.session_state.starting_score !
     st.session_state.score = game_mode
     st.session_state.start_of_turn = game_mode
     st.session_state.history = users[st.session_state.username]["games"][-1] if users[st.session_state.username]["games"] else []
+
+def calculate_stats(history):
+    total_turns = len(history)
+    valid_scores = [pts for pts, result in history if isinstance(pts, int)]
+    total_scored = sum(valid_scores)
+    avg_score = total_scored / total_turns if total_turns > 0 else 0
+    highest_score = max(valid_scores) if valid_scores else 0
+    num_busts = sum(1 for _, result in history if result == "BUST")
+    num_wins = sum(1 for _, result in history if result == "WIN")
+    win_rate = (num_wins / total_turns) * 100 if total_turns > 0 else 0
+    return total_turns, total_scored, avg_score, highest_score, num_busts, num_wins, win_rate
 
 # 1. Handle input first
 score_input = st.number_input("Enter total score for this turn:", min_value=0, max_value=180, step=1)
@@ -99,17 +120,9 @@ st.markdown(
 )
 st.markdown("---")
 
-# Player Statistics
-st.markdown("## 📊 Player Statistics")
-total_turns = len(st.session_state.history)
-valid_scores = [pts for pts, result in st.session_state.history if isinstance(pts, int)]
-total_scored = sum(valid_scores)
-avg_score = total_scored / total_turns if total_turns > 0 else 0
-highest_score = max(valid_scores) if valid_scores else 0
-num_busts = sum(1 for _, result in st.session_state.history if result == "BUST")
-num_wins = sum(1 for _, result in st.session_state.history if result == "WIN")
-win_rate = (num_wins / total_turns) * 100 if total_turns > 0 else 0
+total_turns, total_scored, avg_score, highest_score, num_busts, num_wins, win_rate = calculate_stats(st.session_state.history)
 
+st.markdown("## 📊 Player Statistics")
 st.write(f"**Total Turns:** {total_turns}")
 st.write(f"**Total Points Scored:** {total_scored}")
 st.write(f"**Average Score per Turn:** {avg_score:.2f}")
@@ -171,8 +184,6 @@ elif st.session_state.score == 1:
 elif st.session_state.score == 0:
     st.balloons()
     st.success("🎉 You win! Game over.")
-    users[st.session_state.username]["games"].append(st.session_state.history)
-    save_users(users)
 
 # Turn history
 with st.expander("📜 Turn History"):
@@ -182,14 +193,19 @@ with st.expander("📜 Turn History"):
 # Past Games
 with st.expander("🗂 Past Games"):
     for gi, game in enumerate(users[st.session_state.username]["games"][:-1], 1):
-        st.write(f"Game {gi}:")
+        st.markdown(f"**Game {gi}**")
+        game_summary = []
         for ti, (pts, result) in enumerate(game, 1):
-            st.write(f"  Turn {ti}: -{pts} → {result}")
+            game_summary.append(f"Turn {ti}: -{pts} → {result}")
+        st.text("\n".join(game_summary))
 
 # Reset
 if st.button("🔄 Reset Game"):
     if st.session_state.history:
         users[st.session_state.username]["games"].append(st.session_state.history)
         save_users(users)
+    username = st.session_state.username
     st.session_state.clear()
+    st.session_state.logged_in = True
+    st.session_state.username = username
     st.rerun()
