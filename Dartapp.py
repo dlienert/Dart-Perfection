@@ -1,7 +1,59 @@
 import streamlit as st
 import matplotlib.pyplot as plt
+import json
+import os
 
 st.set_page_config(page_title="Darts Counter", page_icon="🎯")
+
+# User authentication
+USER_DATA_FILE = "user_data.json"
+
+def load_users():
+    if os.path.exists(USER_DATA_FILE):
+        with open(USER_DATA_FILE, "r") as f:
+            return json.load(f)
+    return {}
+
+def save_users(users):
+    with open(USER_DATA_FILE, "w") as f:
+        json.dump(users, f, indent=4)
+
+users = load_users()
+
+st.title("🔐 Login to Darts Counter")
+
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+    st.session_state.username = ""
+
+if not st.session_state.logged_in:
+    login_tab, register_tab = st.tabs(["Login", "Register"])
+    with login_tab:
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+        if st.button("Login"):
+            if username in users and users[username]["password"] == password:
+                st.session_state.logged_in = True
+                st.session_state.username = username
+                st.success(f"Welcome back, {username}!")
+                st.rerun()
+            else:
+                st.error("Invalid username or password.")
+    with register_tab:
+        new_username = st.text_input("New Username")
+        new_password = st.text_input("New Password", type="password")
+        if st.button("Register"):
+            if new_username in users:
+                st.warning("Username already exists. Please choose a different one.")
+            elif new_username.strip() == "":
+                st.warning("Username cannot be empty.")
+            else:
+                users[new_username] = {"password": new_password, "games": []}
+                save_users(users)
+                st.success("Registration successful! Please log in.")
+
+if not st.session_state.logged_in:
+    st.stop()
 
 st.title("🎯 Darts Score Counter")
 
@@ -13,7 +65,7 @@ if "starting_score" not in st.session_state or st.session_state.starting_score !
     st.session_state.starting_score = game_mode
     st.session_state.score = game_mode
     st.session_state.start_of_turn = game_mode
-    st.session_state.history = []
+    st.session_state.history = users[st.session_state.username]["games"][-1] if users[st.session_state.username]["games"] else []
 
 # 1. Handle input first
 score_input = st.number_input("Enter total score for this turn:", min_value=0, max_value=180, step=1)
@@ -31,6 +83,8 @@ if submit:
         st.success("🎯 Finished! (Assuming correct double out)")
         st.session_state.history.append((score_input, "WIN"))
         st.session_state.score = 0
+        users[st.session_state.username]["games"].append(st.session_state.history)
+        save_users(users)
     else:
         st.session_state.score = new_score
         st.session_state.start_of_turn = new_score
@@ -117,13 +171,25 @@ elif st.session_state.score == 1:
 elif st.session_state.score == 0:
     st.balloons()
     st.success("🎉 You win! Game over.")
+    users[st.session_state.username]["games"].append(st.session_state.history)
+    save_users(users)
 
 # Turn history
 with st.expander("📜 Turn History"):
     for i, (pts, result) in enumerate(st.session_state.history[::-1], 1):
         st.write(f"Turn {len(st.session_state.history)-i+1}: -{pts} → {result}")
 
+# Past Games
+with st.expander("🗂 Past Games"):
+    for gi, game in enumerate(users[st.session_state.username]["games"][:-1], 1):
+        st.write(f"Game {gi}:")
+        for ti, (pts, result) in enumerate(game, 1):
+            st.write(f"  Turn {ti}: -{pts} → {result}")
+
 # Reset
 if st.button("🔄 Reset Game"):
+    if st.session_state.history:
+        users[st.session_state.username]["games"].append(st.session_state.history)
+        save_users(users)
     st.session_state.clear()
-    st.experimental_rerun()
+    st.rerun()
