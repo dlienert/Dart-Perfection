@@ -68,39 +68,51 @@ elif st.session_state.current_page == "homepage":
     with game_mode_tabs[0]: # X01 Tab
         st.subheader("X01 Options")
 
-        # Punkte Dropdown (numerisch sortiert)
-        points_options = ["101", "201", "301", "401", "501"] # Füge hier weitere Optionen hinzu, falls gewünscht
-        points_options.sort(key=int) # Sortiere die Liste numerisch
-        selected_points = st.selectbox("Points", points_options, index=points_options.index("501") if "501" in points_options else 0)
-        if selected_points:
-            st.session_state.game_mode = int(selected_points) # Speichere die ausgewählte Punktzahl
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            # Punkte Dropdown (numerisch sortiert)
+            points_options = ["101", "201", "301", "401", "501"] # Füge hier weitere Optionen hinzu, falls gewünscht
+            points_options.sort(key=int) # Sortiere die Liste numerisch
+            selected_points = st.selectbox("Points", points_options, index=points_options.index("501") if "501" in points_options else 0)
+            if selected_points:
+                st.session_state.game_mode = int(selected_points) # Speichere die ausgewählte Punktzahl
 
-        # Check-Out Dropdown mit "Straight Out" und "Double Out"
-        checkout_options = ["Straight Out", "Double Out"]
-        selected_checkout = st.selectbox("Check-Out", checkout_options, index=1 if "Double Out" in checkout_options else 0) # Standardmässig Double Out
+        with col2:
+            # Check-Out Dropdown mit "Straight Out" und "Double Out"
+            checkout_options = ["Straight Out", "Double Out"]
+            selected_checkout = st.selectbox("Check-Out", checkout_options, index=1 if "Double Out" in checkout_options else 0) # Standardmässig Double Out
+            st.session_state.check_out_mode = selected_checkout
 
-        # Sets Dropdown (1 bis 21)
-        sets_options = list(range(1, 22))
-        selected_sets = st.selectbox("Sets", sets_options, index=0) # Standardmässig 1
+        with col3:
+            # Sets Dropdown (1 bis 21)
+            sets_options = list(range(1, 22))
+            selected_sets = st.selectbox("Sets", sets_options, index=0) # Standardmässig 1
+            st.session_state.sets_to_play = selected_sets
 
-        # Legs Dropdown (1 bis 21)
-        legs_options = list(range(1, 22))
-        selected_legs = st.selectbox("Legs", legs_options, index=0) # Standardmässig 1
+        col4, col5, col6 = st.columns(3)
+        with col4:
+            # Set/Leg Dropdown
+            set_leg_options = ["First to", "Best of"]
+            selected_set_leg = st.selectbox("Set/Leg", set_leg_options, index=0) # Standardmässig First to
+            st.session_state.set_leg_rule = selected_set_leg
 
-        first_to_col, checkin_col = st.columns(2)
-        with first_to_col:
-            st.button("First to Set/Leg") # Funktionalität später implementieren
-        with checkin_col:
-            # Hier könntest du "Check-In" als Info anzeigen
-            st.info(f"Check-In: Straight In") # Da Straight In immer aktiv ist
+        with col5:
+            # Check-In Dropdown
+            checkin_options = ["Straight In", "Double In"]
+            selected_checkin = st.selectbox("Check-In", checkin_options, index=0) # Standardmässig Straight In
+            st.session_state.check_in_mode = selected_checkin
+
+        with col6:
+            # Legs Dropdown (1 bis 21)
+            legs_options = list(range(1, 22))
+            selected_legs = st.selectbox("Legs", legs_options, index=0) # Standardmässig 1
+            st.session_state.legs_to_play = selected_legs
 
         if st.button("Start Game"):
             if st.session_state.game_mode == 0: # Sicherstellen, dass ein Spielmodus gewählt wurde
                 st.warning("Please select a game mode.")
             elif st.session_state.game_mode in [101, 201, 301, 401, 501]:
                 st.session_state.current_page = "game"
-                st.session_state.sets_to_play = selected_sets
-                st.session_state.legs_to_play = selected_legs
                 st.rerun()
 
     with game_mode_tabs[1]: # Cricket Tab
