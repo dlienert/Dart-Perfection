@@ -90,18 +90,26 @@
         ],
         "player_stats": {
             "Julien": {
-                "games_played": 0,
+                "games_played": 1,
                 "games_won": 0,
-                "total_score": 0,
-                "highest_score": 0,
-                "total_turns": 0
+                "total_score": 47,
+                "highest_score": 26,
+                "total_turns": 2,
+                "legs_won": 0,
+                "sets_won": 0,
+                "num_busts": 0,
+                "darts_thrown": 3
             },
             "David": {
                 "games_played": 0,
                 "games_won": 0,
-                "total_score": 0,
-                "highest_score": 0,
-                "total_turns": 0
+                "total_score": 392,
+                "highest_score": 137,
+                "total_turns": 7,
+                "legs_won": 0,
+                "sets_won": 0,
+                "num_busts": 0,
+                "darts_thrown": 15
             }
         }
     }
