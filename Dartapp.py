@@ -12,7 +12,12 @@ USER_DATA_FILE = "user_data.json"
 def load_users():
     if os.path.exists(USER_DATA_FILE):
         with open(USER_DATA_FILE, "r") as f:
-            return json.load(f)
+            users = json.load(f)
+            # Sicherstellen, dass jeder Benutzer ein 'player_stats'-Feld hat
+            for username, data in users.items():
+                if "player_stats" not in data:
+                    users[username]["player_stats"] = {}
+            return users
     return {}
 
 def save_users(users):
@@ -108,12 +113,44 @@ elif st.session_state.current_page == "homepage":
             selected_legs = st.selectbox("Legs", legs_options, index=0) # Standardmässig 1
             st.session_state.legs_to_play = selected_legs
 
-        if st.button("Start Game"):
-            if st.session_state.game_mode == 0: # Sicherstellen, dass ein Spielmodus gewählt wurde
-                st.warning("Please select a game mode.")
-            elif st.session_state.game_mode in [101, 201, 301, 401, 501]:
-                st.session_state.current_page = "game"
-                st.rerun()
+        st.markdown("---")
+        st.subheader("Players")
+
+        if "players" not in st.session_state:
+            st.session_state.players = []
+
+        player_name = st.text_input("Enter Player Name:")
+        if st.button("➕ Add Player"):
+            if player_name and player_name not in st.session_state.players:
+                st.session_state.players.append(player_name)
+                st.success(f"Player '{player_name}' added to game.")
+                # Speichere den Spieler in den persistenten Daten
+                if st.session_state.username and st.session_state.username in users:
+                    if player_name not in users[st.session_state.username]["player_stats"]:
+                        users[st.session_state.username]["player_stats"][player_name] = {
+                            "games_played": 0,
+                            "games_won": 0,
+                            "total_score": 0,
+                            "highest_score": 0,
+                            "total_turns": 0,
+                            # Füge hier weitere Statistiken hinzu, die du speichern möchtest
+                        }
+                        save_users(users) # Speichere die aktualisierten Benutzerdaten
+            elif player_name in st.session_state.players:
+                st.warning("Player name already exists in this game.")
+            elif not player_name:
+                st.warning("Please enter a player name.")
+
+        if st.session_state.players:
+            st.subheader("Current Players:")
+            for index, player in enumerate(st.session_state.players):
+                col_player, col_remove = st.columns([3, 1])
+                with col_player:
+                    st.write(f"- {player}")
+                with col_remove:
+                    if st.button("🗑️", key=f"remove_{player}"):
+                        st.session_state.players.pop(index)
+                        st.rerun()
 
     with game_mode_tabs[1]: # Cricket Tab
         st.subheader("Cricket Options")

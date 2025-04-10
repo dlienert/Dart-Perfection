@@ -1,7 +1,8 @@
 {
     "Masayasu": {
         "password": "660bb9c5e8aff270dff00e6feb7dff2bdb6cea76c063c24ec3802819be2caa56",
-        "games": []
+        "games": [],
+        "player_stats": {}
     },
     "dlienert": {
         "password": "e5db055d65faa97d8fdaaf6f31d437f31354fe3b4ac239a2cf25bdb1c32bf936",
@@ -86,6 +87,15 @@
                     "WIN"
                 ]
             ]
-        ]
+        ],
+        "player_stats": {
+            "Julien": {
+                "games_played": 0,
+                "games_won": 0,
+                "total_score": 0,
+                "highest_score": 0,
+                "total_turns": 0
+            }
+        }
     }
 }
