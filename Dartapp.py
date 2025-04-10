@@ -129,31 +129,40 @@ with main_tabs[0]: # Homepage Tab
             st.markdown("---")
             st.subheader("Players")
 
+            if st.session_state.username and st.session_state.username in users and "player_stats" in users[st.session_state.username]:
+                existing_players = list(users[st.session_state.username]["player_stats"].keys())
+            else:
+                existing_players = []
+
+            selected_players = st.multiselect("Select Players", existing_players)
+
             if "players" not in st.session_state:
                 st.session_state.players = []
 
-            player_name = st.text_input("Enter Player Name:")
+            new_player_name = st.text_input("Enter New Player Name (optional):")
             if st.button("➕ Add Player"):
-                if player_name and player_name not in st.session_state.players:
-                    st.session_state.players.append(player_name)
-                    st.success(f"Player '{player_name}' added to game.")
+                if new_player_name and new_player_name not in st.session_state.players and new_player_name not in existing_players:
+                    st.session_state.players.append(new_player_name)
+                    st.success(f"Player '{new_player_name}' added.")
                     # Speichere den Spieler in den persistenten Daten
                     if st.session_state.username and st.session_state.username in users:
-                        if player_name not in users[st.session_state.username]["player_stats"]:
-                            users[st.session_state.username]["player_stats"][player_name] = {
+                        if new_player_name not in users[st.session_state.username]["player_stats"]:
+                            users[st.session_state.username]["player_stats"][new_player_name] = {
                                 "games_played": 0,
                                 "games_won": 0,
                                 "total_score": 0,
                                 "highest_score": 0,
                                 "total_turns": 0,
                                 "num_busts": 0,
-                                # Füge hier weitere Statistiken hinzu, die du speichern möchtest
                             }
-                            save_users(users) # Speichere die aktualisierten Benutzerdaten
-                elif player_name in st.session_state.players:
-                    st.warning("Player name already exists in this game.")
-                elif not player_name:
-                    st.warning("Please enter a player name.")
+                            save_users(users)
+                elif new_player_name in st.session_state.players or new_player_name in existing_players:
+                    st.warning("Player name already exists.")
+                elif not new_player_name and not selected_players:
+                    st.warning("Please select existing players or enter a new player name.")
+                elif not new_player_name:
+                    st.session_state.players.extend(selected_players)
+                    st.success("Selected players added.")
 
             if st.session_state.players:
                 st.subheader("Current Players:")
@@ -165,6 +174,15 @@ with main_tabs[0]: # Homepage Tab
                         if st.button("🗑️", key=f"remove_{player}"):
                             st.session_state.players.pop(index)
                             st.rerun()
+
+        with game_mode_tabs[1]: # Cricket Tab
+            st.subheader("Cricket Options")
+            st.info("Cricket game mode will be implemented in a future version.")
+
+        st.markdown("---")
+        if st.button("Logout"):
+            st.session_state.clear()
+            st.session_state.rerun()
 
 with main_tabs[1]: # Statistics Tab
     st.title("📊 Personal Statistics")
