@@ -322,9 +322,10 @@ elif st.session_state.current_page == "Statistics":
 
 
 # --- Game Tab Logic ---
+# --- Game Tab Logic ---
 elif st.session_state.current_page == "Game":
 
-    # --- Helper Functions (DEFINED AT THE TOP) ---
+    # --- Helper Functions (Defined at the top) ---
     def parse_score_input(score_str):
         # ... (Definition bleibt unverändert) ...
         score_str = str(score_str).upper().strip()
@@ -356,31 +357,22 @@ elif st.session_state.current_page == "Game":
         return total, darts_thrown_turn, last_dart_double_flag, parsed_shots_details
 
     def run_turn_processing(player_name, shots_list):
-        # --- !! Store state BEFORE processing for potential UNDO !! ---
-        current_player_index_before_turn = st.session_state.current_player_index
-        st.session_state.state_before_last_turn = {
-            "player_index": current_player_index_before_turn,
-            "player_name": player_name,
-            "score_before": st.session_state.player_scores[player_name],
+        # ... (Definition bleibt unverändert - contains all bust/win/advance logic) ...
+        global users
+        score_before_turn = st.session_state.player_scores[player_name]
+        st.session_state.state_before_last_turn = { # Store state for potential UNDO
+            "player_index": st.session_state.current_player_index, "player_name": player_name,
+            "score_before": score_before_turn,
             "darts_thrown_player_before": st.session_state.player_darts_thrown.get(player_name, 0),
-            "current_turn_shots_processed": list(shots_list), # Store the shots processed
-            # Store leg/set counts before potential win? For simple undo, maybe skip complex state.
+            "current_turn_shots_processed": list(shots_list),
             "legs_won_before": st.session_state.player_legs_won.get(player_name, 0),
             "sets_won_before": st.session_state.player_sets_won.get(player_name, 0),
         }
-        # --- End Store state ---
-
-        global users
-        score_before_turn = st.session_state.player_scores[player_name] # Already stored above
         calculated_score, darts_thrown_turn, last_dart_double, _ = calculate_turn_total(shots_list)
         if calculated_score is None: st.error("Internal Error during score calculation."); return
         new_score = score_before_turn - calculated_score
         is_bust, is_win, valid_checkout_attempt = False, False, True
-
-        # --- [ REST OF run_turn_processing logic remains the same ] ---
-        # ... (1. Check Bust ... 2. Check Win ... 3. Regular Score Update ...) ...
-        # ... (Update History, Darts Thrown, Stats, etc. ...) ...
-        # --- [ Logic for Bust/Win/Score Update ] ---
+        # --- [ Logic for Bust/Win/Score Update - remains the same ] ---
         # 1. Check Bust
         if new_score < 0 or new_score == 1:
             st.warning(f"❌ Bust! Score remains {score_before_turn}"); st.session_state.player_scores[player_name] = score_before_turn
@@ -415,100 +407,141 @@ elif st.session_state.current_page == "Game":
                  stats = users[st.session_state.username]["player_stats"][player_name]; stats["total_score"] += calculated_score; stats["total_turns"] += 1; stats["darts_thrown"] += darts_thrown_turn
                  if calculated_score > stats.get("highest_score", 0): stats["highest_score"] = calculated_score
                  save_users(users)
-        # --- [ End of Logic for Bust/Win/Score Update ] ---
-
         # --- Post-Turn Advancement Logic ---
         num_players_adv = len(st.session_state.players_selected_for_game)
         should_advance_turn = is_bust or is_win or (len(shots_list) == 3)
         if not valid_checkout_attempt and new_score == 0: should_advance_turn = False
 
         if should_advance_turn:
-            # Store index BEFORE advancing, in case we undo
+             # Store index BEFORE advancing for potential UNDO needs accurate index
             index_before_advance = st.session_state.current_player_index
-            st.session_state.state_before_last_turn["player_index"] = index_before_advance # Update the stored state
+            # Update the stored state AFTER calculations but BEFORE clearing shots/advancing player
+            if st.session_state.state_before_last_turn: # Check if state exists
+                 st.session_state.state_before_last_turn["player_index"] = index_before_advance
 
-            # Clear input buffer for the player whose turn just ended
-            # This should happen BEFORE advancing index/leg/set
-            st.session_state.current_turn_shots = []
+            st.session_state.current_turn_shots = [] # Clear input for next turn/player
 
             if st.session_state.leg_over:
-                legs_needed = math.ceil((st.session_state.legs_to_play + 1) / 2) if st.session_state.set_leg_rule == "Best of" else st.session_state.legs_to_play
-                if st.session_state.player_legs_won[player_name] >= legs_needed: # Set Win
-                    st.session_state.set_over = True; st.session_state.player_sets_won[player_name] += 1; st.success(f"🎉 {player_name} wins Set {st.session_state.current_set}!")
-                    if player_name in users[st.session_state.username]["player_stats"]: users[st.session_state.username]["player_stats"][player_name]["sets_won"] += 1; save_users(users)
-                    sets_needed = math.ceil((st.session_state.sets_to_play + 1) / 2) if st.session_state.set_leg_rule == "Best of" else st.session_state.sets_to_play
-                    if st.session_state.player_sets_won[player_name] >= sets_needed: # Game Win
-                        st.session_state.game_over, st.session_state.winner = True, player_name
-                        for p in st.session_state.players_selected_for_game:
-                            if p in users[st.session_state.username]["player_stats"]: stats_p=users[st.session_state.username]["player_stats"][p]; stats_p["games_played"] += 1;
-                            if p == player_name: stats_p["games_won"] += 1
-                        save_users(users)
-                        st.session_state.state_before_last_turn = None # Cannot undo after game over
-                    else: # Next Set
-                        st.info("Prepare for next Set..."); time.sleep(1.5); st.session_state.current_set += 1; st.session_state.current_leg = 1
-                        st.session_state.player_scores = {p: st.session_state.starting_score for p in st.session_state.players_selected_for_game}
-                        st.session_state.player_legs_won = {p: 0 for p in st.session_state.players_selected_for_game}; st.session_state.player_last_turn_scores = {p: [] for p in st.session_state.players_selected_for_game}
-                        st.session_state.leg_over, st.session_state.set_over = False, False; st.session_state.current_player_index = (index_before_advance + 1) % num_players_adv
-                        st.session_state.state_before_last_turn = None # Clear undo state on set transition for simplicity
-                else: # Next Leg
-                    st.info("Prepare for next Leg..."); time.sleep(1.5); st.session_state.current_leg += 1
-                    st.session_state.player_scores = {p: st.session_state.starting_score for p in st.session_state.players_selected_for_game}
-                    st.session_state.player_last_turn_scores = {p: [] for p in st.session_state.players_selected_for_game}; st.session_state.leg_over = False
-                    st.session_state.current_player_index = (index_before_advance + 1) % num_players_adv
-                    st.session_state.state_before_last_turn = None # Clear undo state on leg transition for simplicity
+                 legs_needed = math.ceil((st.session_state.legs_to_play + 1) / 2) if st.session_state.set_leg_rule == "Best of" else st.session_state.legs_to_play
+                 if st.session_state.player_legs_won[player_name] >= legs_needed: # Set Win
+                      st.session_state.set_over = True; st.session_state.player_sets_won[player_name] += 1; st.success(f"🎉 {player_name} wins Set {st.session_state.current_set}!")
+                      if player_name in users[st.session_state.username]["player_stats"]: users[st.session_state.username]["player_stats"][player_name]["sets_won"] += 1; save_users(users)
+                      sets_needed = math.ceil((st.session_state.sets_to_play + 1) / 2) if st.session_state.set_leg_rule == "Best of" else st.session_state.sets_to_play
+                      if st.session_state.player_sets_won[player_name] >= sets_needed: # Game Win
+                           st.session_state.game_over, st.session_state.winner = True, player_name
+                           for p in st.session_state.players_selected_for_game:
+                               if p in users[st.session_state.username]["player_stats"]: stats_p=users[st.session_state.username]["player_stats"][p]; stats_p["games_played"] += 1;
+                               if p == player_name: stats_p["games_won"] += 1
+                           save_users(users); st.session_state.state_before_last_turn = None # No undo after game over
+                      else: # Next Set
+                           st.info("Prepare for next Set..."); time.sleep(1.5); st.session_state.current_set += 1; st.session_state.current_leg = 1
+                           st.session_state.player_scores = {p: st.session_state.starting_score for p in st.session_state.players_selected_for_game}
+                           st.session_state.player_legs_won = {p: 0 for p in st.session_state.players_selected_for_game}; st.session_state.player_last_turn_scores = {p: [] for p in st.session_state.players_selected_for_game}
+                           st.session_state.leg_over, st.session_state.set_over = False, False; st.session_state.current_player_index = (index_before_advance + 1) % num_players_adv
+                           st.session_state.state_before_last_turn = None # Clear undo state on set transition
+                 else: # Next Leg
+                      st.info("Prepare for next Leg..."); time.sleep(1.5); st.session_state.current_leg += 1
+                      st.session_state.player_scores = {p: st.session_state.starting_score for p in st.session_state.players_selected_for_game}
+                      st.session_state.player_last_turn_scores = {p: [] for p in st.session_state.players_selected_for_game}; st.session_state.leg_over = False
+                      st.session_state.current_player_index = (index_before_advance + 1) % num_players_adv
+                      st.session_state.state_before_last_turn = None # Clear undo state on leg transition
             else: # Leg not over, advance player
-                st.session_state.current_player_index = (index_before_advance + 1) % num_players_adv
+                 st.session_state.current_player_index = (index_before_advance + 1) % num_players_adv
+                 # Keep st.session_state.state_before_last_turn available
 
-            # Don't clear state_before_last_turn here if just advancing player
+            st.rerun() # Rerun AFTER all state updates and advancement logic
 
-            st.rerun() # Rerun only AFTER turn processing and advancement decision
-
-        # else: Turn didn't advance (e.g. invalid checkout), state_before_last_turn is NOT updated, allow immediate correction/re-throw.
-
+    # --- !! NEW: Checkout Suggestions Data !! ---
+    # (Place this dictionary definition near the top, after helper functions)
+    # Using "Bull" for D25, standard numbers for singles. Limit suggestions per score.
+    CHECKOUT_SUGGESTIONS = {
+        170: ["T20 T20 Bull"], 167: ["T20 T19 Bull"], 164: ["T20 T18 Bull", "T19 T19 Bull"],
+        161: ["T20 T17 Bull"], 160: ["T20 T20 D20"], 158: ["T20 T20 D19"], 157: ["T20 T19 D20"],
+        156: ["T20 T20 D18"], 155: ["T20 T19 D19"], 154: ["T20 T18 D20"], 153: ["T20 T19 D18"],
+        152: ["T20 T20 D16"], 151: ["T20 T17 D20"], 150: ["T20 T18 D18", "Bull Bull Bull"],
+        149: ["T20 T19 D16"], 148: ["T20 T16 D20"], 147: ["T20 T17 D18"], 146: ["T20 T18 D16", "T19 T19 D16"],
+        145: ["T20 T15 D20"], 144: ["T20 T20 D12", "T18 T18 D18"], 143: ["T20 T17 D16"], 142: ["T20 T14 D20"],
+        141: ["T20 T19 D12"], 140: ["T20 T20 D10"], 139: ["T19 T14 D20", "T20 T13 D20"], 138: ["T20 T18 D12"],
+        137: ["T19 T16 D16", "T20 T19 D10"], 136: ["T20 T20 D8"], 135: ["Bull T15 D20", "T20 T17 D12"], 134: ["T20 T14 D16"],
+        133: ["T20 T19 D8"], 132: ["T20 T16 D12", "Bull Bull D16"], 131: ["T20 T13 D16"], 130: ["T20 T20 D5", "20 T20 D20"],
+        129: ["T19 T16 D12", "T19 T10 Bull"], 128: ["T18 T14 D16", "T20 T16 D10"], 127: ["T20 T17 D8", "T19 T10 D20"],
+        126: ["T19 T19 D6", "T20 T18 D6"], 125: ["Bull T17 D12", "25 T20 D20"], 124: ["T20 T16 D8", "T20 14 Bull"],
+        123: ["T19 T16 D9", "T19 16 Bull"], 122: ["T18 T18 D7", "T18 18 Bull"], 121: ["T20 T15 D8", "T17 T10 D10"],
+        120: ["T20 20 D20", "T20 S20 D20"], 119: ["T19 T14 D10", "T20 T13 D10"], 118: ["T20 18 D20"], 117: ["T20 17 D20"],
+        116: ["T20 16 D20", "T19 19 D20"], 115: ["T19 18 D20", "T20 15 D20"], 114: ["T20 14 D20", "T18 20 D20"],
+        113: ["T19 16 D20", "T20 13 D20"], 112: ["T20 12 D20", "20 T20 D16"], 111: ["T19 14 D20", "T20 11 D20"],
+        110: ["T20 10 D20", "Bull 20 D20"], 109: ["T19 12 D20", "T20 9 D20"], 108: ["T19 11 D20", "T20 8 D20"],
+        107: ["T19 10 D20", "T17 Bull"], 106: ["T20 6 D20", "T18 12 D20"], 105: ["T19 8 D20", "T20 5 D20"],
+        104: ["T18 10 D20", "T16 Bull"], 103: ["T19 6 D20", "T17 12 D20"], 102: ["T20 2 D20", "T18 8 D20"],
+        101: ["T17 Bull", "T20 1 D20"], 100: ["T20 D20", "20 D40 (T20 D10)"], 99: ["T19 10 D16", "T15 12 D18"],
+        98: ["T20 D19"], 97: ["T19 D20"], 96: ["T20 D18"], 95: ["T19 D19", "Bull T15"],
+        94: ["T18 D20"], 93: ["T19 D18"], 92: ["T20 D16"], 91: ["T17 D20"], 90: ["T18 D18", "T20 D15"],
+        89: ["T19 D16"], 88: ["T16 D20", "T20 D14"], 87: ["T17 D18"], 86: ["T18 D16"],
+        85: ["T15 D20", "Bull D18"], 84: ["T20 D12"], 83: ["T17 D16"], 82: ["T14 D20", "Bull D16"],
+        81: ["T19 D12", "T15 D18"], 80: ["T20 D10", "T16 D16"], 79: ["T13 D20", "T19 D11"], 78: ["T18 D12"],
+        77: ["T15 D16", "T19 D10"], 76: ["T20 D8"], 75: ["T17 D12", "T15 D15"], 74: ["T14 D16", "T18 D10"],
+        73: ["T19 D8"], 72: ["T16 D12", "T12 D18"], 71: ["T13 D16"], 70: ["T18 D8", "T10 D20"],
+        69: ["T19 D6", "T15 D12"], 68: ["T20 D4"], 67: ["T17 D8", "T9 D20"], 66: ["T10 D18", "T16 D9"],
+        65: ["T19 D4", "T11 D16", "25 D20"], 64: ["T16 D8", "T8 D20"], 63: ["T13 D12"], 62: ["T10 D16", "T14 D10"],
+        61: ["T15 D8", "T11 D14", "25 D18"], 60: ["20 D20", "T20 Miss D20"], 59: ["19 D20", "T13 D10"], 58: ["18 D20", "T10 D14"],
+        57: ["17 D20", "T19 Miss D20"], 56: ["16 D20", "T16 D4"], 55: ["15 D20", "T11 D11"], 54: ["14 D20", "T18 Miss D18"],
+        53: ["13 D20", "T17 D1"], 52: ["12 D20", "T16 D2"], 51: ["11 D20", "19 D16"], 50: ["Bull", "10 D20", "18 D16"],
+        49: ["9 D20", "17 D16"], 48: ["16 D16", "8 D20"], 47: ["15 D16", "7 D20"], 46: ["6 D20", "10 D18"],
+        45: ["13 D16", "9 D18", "5 D20"], 44: ["12 D16", "4 D20"], 43: ["3 D20", "11 D16"], 42: ["10 D16", "6 D18"],
+        41: ["9 D16", "1 D20"], 40: ["D20", "20 D10"], 39: ["7 D16"], 38: ["6 D16", "D19"],
+        37: ["5 D16"], 36: ["D18", "4 D16"], 35: ["3 D16"], 34: ["D17", "2 D16"],
+        33: ["1 D16"], 32: ["D16", "16 D8"], 31: ["15 D8", "7 D12"], 30: ["D15", "10 D10"],
+        29: ["13 D8", "5 D12"], 28: ["D14", "12 D8"], 27: ["19 D4", "11 D8"], 26: ["D13", "10 D8"],
+        25: ["17 D4", "9 D8"], 24: ["D12", "8 D8"], 23: ["15 D4", "7 D8"], 22: ["D11", "6 D8"],
+        21: ["13 D4", "5 D8"], 20: ["D10"], 19: ["11 D4", "3 D8"], 18: ["D9", "2 D8"],
+        17: ["9 D4", "1 D8"], 16: ["D8"], 15: ["7 D4"], 14: ["D7"], 13: ["5 D4"],
+        12: ["D6"], 11: ["3 D4"], 10: ["D5"], 9: ["1 D4"], 8: ["D4"],
+        7: ["T1 D2", "3 D2"], # Less common
+        6: ["D3"], 5: ["1 D2"], 4: ["D2"], 3: ["1 D1"], 2: ["D1"],
+    }
+    BOGIE_NUMBERS = {169, 168, 166, 165, 163, 162, 159}
 
     # --- Check Game State (Moved after function definitions) ---
     if st.session_state.game_over:
         # ... (Game over display code - unchanged) ...
-        st.title("🎉 Game Over! 🎉")
-        if st.session_state.winner: st.header(f"🏆 Winner: {st.session_state.winner} 🏆")
-        else: st.header("Match finished.")
-        st.balloons()
+        st.title("🎉 Game Over! 🎉");
+        if st.session_state.winner: st.header(f"🏆 Winner: {st.session_state.winner} 🏆");
+        else: st.header("Match finished.");
+        st.balloons();
         if st.button("Play Again / New Game Setup", use_container_width=True):
-            st.session_state.current_page = "Homepage"; st.session_state.players_selected_for_game = []
-            st.rerun()
-        st.stop()
-
+            st.session_state.current_page = "Homepage"; st.session_state.players_selected_for_game = []; st.rerun();
+        st.stop();
 
     if not st.session_state.players_selected_for_game:
          # ... (No players selected error - unchanged) ...
          st.error("No players selected. Go to Homepage to start.");
-         if st.button("🏠 Back to Homepage", use_container_width=True):
-             st.session_state.current_page = "Homepage"; st.rerun()
-         st.stop()
+         if st.button("🏠 Back to Homepage", use_container_width=True): st.session_state.current_page = "Homepage"; st.rerun();
+         st.stop();
 
     # --- Game Interface ---
     st.title(f"🎯 Game On: {st.session_state.game_mode} - Set {st.session_state.current_set}/{st.session_state.sets_to_play} | Leg {st.session_state.current_leg}/{st.session_state.legs_to_play}")
     st.caption(f"Mode: {st.session_state.check_out_mode} | Rule: {st.session_state.set_leg_rule}")
 
     # --- Main Two-Column Layout ---
-    left_col, right_col = st.columns([2, 1.2])
+    left_col, right_col = st.columns([2, 1.2]) # Scores | Input
 
     with left_col:
-        # ... (Scoreboard display code - unchanged) ...
         st.subheader("Scores")
         num_players = len(st.session_state.players_selected_for_game)
         if num_players > 0:
             for i, player in enumerate(st.session_state.players_selected_for_game):
                 is_current_player = (i == st.session_state.current_player_index)
                 border_style = "border: 3px solid #FF4B4B; padding: 5px 8px; border-radius: 5px; background-color: #FFF0F0;" if is_current_player else "border: 1px solid #ccc; padding: 5px 8px; border-radius: 5px;"
+
                 with st.container():
                     st.markdown(f"<div style='{border_style}'>", unsafe_allow_html=True)
                     st.markdown(f"<h5 style='text-align: center; margin-bottom: 5px; margin-top: 0;'>{'▶️ ' if is_current_player else ''}{player}</h5>", unsafe_allow_html=True)
-                    col_score, col_stats = st.columns([2, 3])
+
+                    col_score, col_stats = st.columns([2, 3]) # Score | Stats
+
                     with col_score:
                         actual_score = st.session_state.player_scores.get(player, st.session_state.starting_score)
-                        display_score_val, score_color = actual_score, "black"; is_potential_bust = False
-                        partial_turn_score = 0
+                        display_score_val, score_color = actual_score, "black"; is_potential_bust = False; partial_turn_score = 0
                         if is_current_player and st.session_state.current_turn_shots:
                             partial_turn_score_calc, _, _, _ = calculate_turn_total(st.session_state.current_turn_shots)
                             if partial_turn_score_calc is not None:
@@ -516,31 +549,60 @@ elif st.session_state.current_page == "Game":
                                 temp_remaining_score = actual_score - partial_turn_score
                                 if temp_remaining_score < 0 or temp_remaining_score == 1: display_score_val, score_color, is_potential_bust = "BUST", "red", True
                                 elif temp_remaining_score >= 0: display_score_val = temp_remaining_score
-                        st.markdown(f"<h2 style='text-align: center; font-size: 3em; margin-bottom: 0; color: {score_color}; line-height: 1.1;'>{display_score_val}</h2>", unsafe_allow_html=True) # Restored 3em
+                        st.markdown(f"<h2 style='text-align: center; font-size: 3em; margin-bottom: 0; color: {score_color}; line-height: 1.1;'>{display_score_val}</h2>", unsafe_allow_html=True)
+
                     with col_stats:
                         darts = st.session_state.player_darts_thrown.get(player, 0); history = st.session_state.player_turn_history.get(player, [])
                         total_score_thrown = sum(t[0] for t in history if len(t)>2 and t[2] != "BUST")
                         avg_3_dart = (total_score_thrown / darts * 3) if darts > 0 else 0.00
                         legs = st.session_state.player_legs_won.get(player, 0); sets = st.session_state.player_sets_won.get(player, 0)
                         st.markdown(f"""<div style='text-align: left; font-size: 0.9em; padding-top: 15px;'>📊Avg: {avg_3_dart:.2f}<br>Legs: {legs} | Sets: {sets}</div>""", unsafe_allow_html=True)
+
+                    # --- Display Current Turn Total ---
                     turn_total_display = ""
                     if is_current_player and partial_turn_score > 0 and not is_potential_bust: turn_total_display = f"({partial_turn_score} thrown)"
                     st.markdown(f"<p style='text-align: center; font-size: 1.1em; color: blue; margin-bottom: 2px; height: 1.3em;'>{turn_total_display or '&nbsp;'}</p>", unsafe_allow_html=True)
+
+                    # Display Last Turn
                     last_shots = st.session_state.player_last_turn_scores.get(player, []); last_turn_str = " ".join(map(str, last_shots)) if last_shots else "-"
                     last_turn_total, _, _, _ = calculate_turn_total(last_shots) if last_shots else (0,0,False, [])
                     st.markdown(f"<p style='text-align: center; font-size: 0.8em; color: grey; margin-bottom: 2px;'>Last: {last_turn_str} ({last_turn_total or 0})</p>", unsafe_allow_html=True)
-                    st.markdown("</div>", unsafe_allow_html=True)
-                st.markdown("<div style='margin-bottom: 8px;'></div>", unsafe_allow_html=True)
+
+                    
+                    # --- !! Angepasste Checkout Suggestions Display !! ---
+                    if is_current_player and st.session_state.check_out_mode == "Double Out":
+                        # Berechne den aktuell verbleibenden Score basierend auf eingegebenen Darts
+                        score_at_turn_start = st.session_state.player_scores.get(player, st.session_state.starting_score)
+                        current_turn_shots_list = st.session_state.current_turn_shots
+                        score_thrown_this_turn, darts_thrown_this_turn, _, _ = calculate_turn_total(current_turn_shots_list)
+
+                        score_remaining_now = score_at_turn_start
+                        if score_thrown_this_turn is not None:
+                             score_remaining_now -= score_thrown_this_turn
+
+                        darts_left = 3 - darts_thrown_this_turn
+
+                        # Zeige Vorschläge basierend auf dem aktuellen Restscore, wenn noch Darts übrig sind
+                        if darts_left > 0 and 2 <= score_remaining_now <= 170 and score_remaining_now not in BOGIE_NUMBERS:
+                            # Suche Vorschläge für den aktuellen Restscore (nutzt unser 3-Dart-Dict)
+                            suggestions = CHECKOUT_SUGGESTIONS.get(score_remaining_now)
+                            if suggestions:
+                                display_suggestions = " | ".join(suggestions[:2]) # Zeige max 2 Vorschläge
+                                # Zeige auch an, wie viele Darts noch übrig sind
+                                st.markdown(f"<p style='text-align: center; font-size: 0.9em; color: green; margin-top: 5px;'>🎯 **Out ({darts_left} Darts): {display_suggestions}**</p>", unsafe_allow_html=True)
+                            # else: Optional: Hinweis, dass Finish möglich aber nicht im Dict ist
+                        elif score_remaining_now in BOGIE_NUMBERS:
+                             st.markdown("<p style='text-align: center; font-size: 0.8em; color: red; margin-top: 5px;'>No checkout</p>", unsafe_allow_html=True)
+                        # Kein Vorschlag wenn Score > 170, < 2 oder Darts verbraucht
+
+                    st.markdown("</div>", unsafe_allow_html=True) # Close border div
+                st.markdown("<div style='margin-bottom: 8px;'></div>", unsafe_allow_html=True) # Space below player box
         else:
             st.warning("No players in the current game to display scoreboard.")
 
     with right_col:
         # --- Input Area (in Right Column) ---
         if not st.session_state.game_over:
-            # --- Initialize undo state if it doesn't exist ---
-            if "state_before_last_turn" not in st.session_state:
-                st.session_state.state_before_last_turn = None
-
             if st.session_state.players_selected_for_game:
                  current_player_index_safe = st.session_state.current_player_index % len(st.session_state.players_selected_for_game)
                  current_player_name = st.session_state.players_selected_for_game[current_player_index_safe]
@@ -557,14 +619,11 @@ elif st.session_state.current_page == "Game":
             st.caption(f"Dart {num_darts_entered + 1} of 3")
             input_disabled = num_darts_entered >= 3
 
-            # Keypad Button Style
             compact_button_style = """<style> div[data-testid*="stButton"] > button { margin: 1px 1px !important; padding: 1px 0px !important; height: 38px !important; font-size: 0.9em !important; min-width: 30px !important; } </style>"""
             st.markdown(compact_button_style, unsafe_allow_html=True)
 
-            # --- Action Row (DBL, TPL, Back, Undo) ---
             st.markdown("<div style='margin-bottom: 2px;'></div>", unsafe_allow_html=True)
-            # Now use 4 columns for the actions
-            cols_action = st.columns(4)
+            cols_action = st.columns(4) # Add 4th column for Undo
             double_btn_type = "primary" if st.session_state.pending_modifier == "D" else "secondary"
             if cols_action[0].button("🟡 DBL", key="pad_btn_D", help="Set next dart as Double", use_container_width=True, type=double_btn_type, disabled=input_disabled):
                 st.session_state.pending_modifier = None if st.session_state.pending_modifier == "D" else "D"; st.rerun()
@@ -575,46 +634,29 @@ elif st.session_state.current_page == "Game":
                 if st.session_state.pending_modifier: st.session_state.pending_modifier = None
                 elif st.session_state.current_turn_shots: st.session_state.current_turn_shots.pop()
                 st.rerun()
-            # --- NEW UNDO BUTTON ---
-            can_undo = st.session_state.state_before_last_turn is not None
+            # --- UNDO BUTTON ---
+            can_undo = st.session_state.get("state_before_last_turn") is not None
             if cols_action[3].button("↩️ Undo", key="pad_btn_undo", help="Undo last completed turn", use_container_width=True, disabled=not can_undo):
                 if st.session_state.state_before_last_turn:
                     state = st.session_state.state_before_last_turn
-                    undo_player_name = state["player_name"]
-                    undo_player_index = state["player_index"]
-
-                    # Restore state from before the undone turn
+                    undo_player_name = state["player_name"]; undo_player_index = state["player_index"]
                     st.session_state.current_player_index = undo_player_index
                     st.session_state.player_scores[undo_player_name] = state["score_before"]
                     st.session_state.player_darts_thrown[undo_player_name] = state["darts_thrown_player_before"]
-
-                    # Simple Undo: Remove last entry from official turn history if it exists
-                    if st.session_state.player_turn_history.get(undo_player_name):
-                        st.session_state.player_turn_history[undo_player_name].pop()
-
-                    # Restore the shots of the undone turn into the input buffer
-                    st.session_state.current_turn_shots = state["current_turn_shots_processed"]
-
-                    # Clear 'last turn' display for the player whose turn was undone
-                    st.session_state.player_last_turn_scores[undo_player_name] = []
-
-                    # Clear potentially outdated leg/set/game state if a win was undone (simplification)
-                    st.session_state.leg_over = False
-                    st.session_state.set_over = False
-                    st.session_state.game_over = False
-                    st.session_state.winner = None
-                    # Note: This doesn't perfectly restore leg/set counters if a win was undone,
-                    # but prevents premature game end after undo. Full state restore is much harder.
-
-                    st.session_state.pending_modifier = None # Clear any pending modifier
-                    st.session_state.message = f"Undid last turn for {undo_player_name}. Enter correct score."
-                    st.session_state.state_before_last_turn = None # Consume the undo state
+                    if st.session_state.player_turn_history.get(undo_player_name): st.session_state.player_turn_history[undo_player_name].pop() # Simple history removal
+                    st.session_state.current_turn_shots = state["current_turn_shots_processed"] # Put shots back
+                    st.session_state.player_last_turn_scores[undo_player_name] = [] # Clear last turn display for undone player
+                    # Reset potentially changed game state flags (simplistic approach)
+                    st.session_state.leg_over = False; st.session_state.set_over = False; st.session_state.game_over = False; st.session_state.winner = None
+                    # Restore previous leg/set counts? More complex, maybe restore from state if saved?
+                    st.session_state.player_legs_won[undo_player_name] = state["legs_won_before"]
+                    st.session_state.player_sets_won[undo_player_name] = state["sets_won_before"]
+                    st.session_state.pending_modifier = None; st.session_state.message = f"Undid last turn for {undo_player_name}. Enter correct score."
+                    st.session_state.state_before_last_turn = None # Consume undo state
                     st.rerun()
-                else:
-                    st.warning("Nothing to undo.")
+                else: st.warning("Nothing to undo.")
 
-
-            # Number Grid (Remains the same logic)
+            # Number Grid
             st.markdown("<div style='margin-top: 3px;'></div>", unsafe_allow_html=True)
             keypad_numbers = list(range(1, 21)) + [25, 0]
             num_cols = 4
@@ -643,7 +685,6 @@ elif st.session_state.current_page == "Game":
                                     is_valid_checkout = (st.session_state.check_out_mode != "Double Out" or last_dart_double_flag_check)
                                     if num_darts_now == 3 or (is_potential_win and is_valid_checkout): run_turn_processing(current_player_name, shots_so_far)
                                     else: st.rerun()
-
             st.markdown("---")
 
         else: # If game is over
