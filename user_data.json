@@ -2,7 +2,9 @@
     "Masayasu": {
         "password": "660bb9c5e8aff270dff00e6feb7dff2bdb6cea76c063c24ec3802819be2caa56",
         "games": [],
-        "player_stats": {}
+        "player_stats": {},
+        "checkout_log": [],
+        "preferred_doubles": []
     },
     "dlienert": {
         "password": "e5db055d65faa97d8fdaaf6f31d437f31354fe3b4ac239a2cf25bdb1c32bf936",
@@ -129,6 +131,15 @@
                 "leg": 1,
                 "set": 1
             }
+        ],
+        "preferred_doubles": [
+            "D10",
+            "D6",
+            "D20",
+            "D3",
+            "D17",
+            "D18",
+            "D19"
         ]
     }
 }
