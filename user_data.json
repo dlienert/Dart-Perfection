@@ -90,18 +90,18 @@
         ],
         "player_stats": {
             "David": {
-                "games_played": 0,
-                "games_won": 0,
-                "legs_won": 0,
-                "sets_won": 0,
-                "total_score": 61,
-                "highest_score": 61,
-                "total_turns": 1,
+                "games_played": 1,
+                "games_won": 1,
+                "legs_won": 1,
+                "sets_won": 1,
+                "total_score": 162,
+                "highest_score": 101,
+                "total_turns": 2,
                 "num_busts": 0,
-                "darts_thrown": 3
+                "darts_thrown": 5
             },
             "Julien": {
-                "games_played": 0,
+                "games_played": 1,
                 "games_won": 0,
                 "legs_won": 0,
                 "sets_won": 0,
@@ -111,6 +111,24 @@
                 "num_busts": 0,
                 "darts_thrown": 3
             }
-        }
+        },
+        "checkout_log": [
+            {
+                "timestamp": "2025-04-10 17:37:21",
+                "player": "David",
+                "score_before": 101,
+                "shots": [
+                    "T17",
+                    "D25"
+                ],
+                "calculated_score": 101,
+                "result": "WIN",
+                "last_dart_was_double": true,
+                "last_dart_str": "D25",
+                "game_mode": 101,
+                "leg": 1,
+                "set": 1
+            }
+        ]
     }
 }
