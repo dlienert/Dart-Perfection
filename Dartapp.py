@@ -170,28 +170,61 @@ with main_tabs[0]: # Homepage Tab
         if st.button("Logout"):
             st.session_state.clear()
             st.session_state.rerun()
+import pandas as pd
+import matplotlib.pyplot as plt
 
 with main_tabs[1]: # Statistics Tab
     st.title("📊 Personal Statistics")
     if st.session_state.username in users and "player_stats" in users[st.session_state.username]:
         player_stats = users[st.session_state.username]["player_stats"]
         if player_stats:
+            # Dropdown zur Auswahl der Statistik
+            stats_options = ["Games Played", "Games Won", "Win Rate", "Total Score", "Average Score", "Highest Score", "Total Turns", "Busts"]
+            selected_stat = st.selectbox("Select Statistic", stats_options)
+
+            # Tabellendaten (bleibt gleich)
+            table_data = []
             for player, stats in player_stats.items():
-                st.subheader(f"👤 {player}")
-                st.write(f"**Games Played:** {stats['games_played']}")
-                st.write(f"**Games Won:** {stats['games_won']}")
-                win_rate = (stats['games_won'] / stats['games_played']) * 100 if stats['games_played'] > 0 else 0
-                st.write(f"**Win Rate:** {win_rate:.2f}%")
-                st.write(f"**Total Score:** {stats['total_score']}")
-                avg_score = stats['total_score'] / stats['total_turns'] if stats['total_turns'] > 0 else 0
-                st.write(f"**Average Score:** {avg_score:.2f}")
-                st.write(f"**Highest Score:** {stats['highest_score']}")
-                st.write(f"**Total Turns:** {stats['total_turns']}")
-                st.markdown("---")
-        else:
-            st.info("No player statistics available yet.")
-    else:
-        st.info("Please log in to see your statistics.")
+                row = {"Player": player}
+                if selected_stat == "Games Played":
+                    row["Value"] = stats.get("games_played", 0)
+                elif selected_stat == "Games Won":
+                    row["Value"] = stats.get("games_won", 0)
+                elif selected_stat == "Win Rate":
+                    games_played = stats.get("games_played", 0)
+                    games_won = stats.get("games_won", 0)
+                    win_rate = (games_won / games_played) * 100 if games_played > 0 else 0
+                    row["Value"] = f"{win_rate:.2f}%"
+                elif selected_stat == "Total Score":
+                    row["Value"] = stats.get("total_score", 0)
+                elif selected_stat == "Average Score":
+                    total_score = stats.get("total_score", 0)
+                    total_turns = stats.get("total_turns", 0)
+                    avg_score = total_score / total_turns if total_turns > 0 else 0
+                    row["Value"] = f"{avg_score:.2f}"
+                elif selected_stat == "Highest Score":
+                    row["Value"] = stats.get("highest_score", 0)
+                elif selected_stat == "Total Turns":
+                    row["Value"] = stats.get("total_turns", 0)
+                elif selected_stat == "Busts":
+                    row["Value"] = stats.get("num_busts", 0)
+                table_data.append(row)
+
+            # Zeige die Daten als Tabelle an
+            if table_data:
+                df = pd.DataFrame(table_data)
+                st.dataframe(df)
+            else:
+                st.info("No player statistics available yet.")
+
+            st.markdown("---")
+            st.subheader("Visualizations")
+
+            if player_stats:
+                player_names = list(player_stats.keys())
+
+                # Balkendiagramm für Games Played
+                games_played = [stats.get("games_played", 0)]
 
 with main_tabs[2]: # Game Tab
     if st.session_state.current_page == "game":
