@@ -7,6 +7,35 @@ import pandas as pd
 import time
 import math # Needed for ceiling function in set/leg logic
 
+# --- Language Translation Setup ---
+
+# Define translation dictionary for app text
+translations = {
+    "welcome": {"de": "Willkommen bei Darts Counter", "en": "Welcome to Darts Counter"},
+    "login": {"de": "Anmelden", "en": "Login"},
+    "register": {"de": "Registrieren", "en": "Register"},
+    "username": {"de": "Benutzername", "en": "Username"},
+    "password": {"de": "Passwort", "en": "Password"},
+    "start_game": {"de": "Spiel starten", "en": "Start Game"},
+    "logout": {"de": "Abmelden", "en": "Logout"},
+    "players": {"de": "Spieler", "en": "Players"},
+    "score": {"de": "Punktestand", "en": "Score"},
+    "statistics": {"de": "Statistiken", "en": "Statistics"},
+    "settings": {"de": "Einstellungen", "en": "Settings"},
+    "game": {"de": "Spiel", "en": "Game"},
+    "homepage": {"de": "Startseite", "en": "Homepage"},
+    "select_language": {"de": "Sprache wählen", "en": "Select Language"},
+    "selected_language": {"de": "Gewählte Sprache:", "en": "Selected Language:"},
+    "players_selected": {"de": "Spieler ausgewählt", "en": "Players selected"},
+    "start_game_button": {"de": "🎯 Spiel starten", "en": "🎯 Start Game"},
+}
+
+# Define helper function to fetch translation based on session state
+def t(key):
+    """Returns the translation for a given key based on selected language."""
+    lang = st.session_state.get("language", "en")  # Default to English
+    return translations.get(key, {}).get(lang, key)  # Fallback to key if missing
+
 # --- Configuration ---
 USER_DATA_FILE = "user_data.json"
 st.set_page_config(page_title="Darts Counter", page_icon="🎯", layout="wide")
