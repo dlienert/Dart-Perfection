@@ -559,7 +559,7 @@ elif st.session_state.current_page == "⚙️ Settings":
 # --- Game Tab Logic ---
 elif st.session_state.current_page == "Game":
 
-    # --- Helper Functions (Expanded) ---
+    # --- Helper Functions (Expanded for Readability) ---
     def parse_score_input(score_str):
         score_str = str(score_str).upper().strip()
         is_double = False
@@ -574,221 +574,288 @@ elif st.session_state.current_page == "Game":
                         value = num * 3
                         is_triple = True
                     else:
-                        is_valid = False
+                        is_valid = False # Invalid triple number
                 else:
-                    is_valid = False
+                    is_valid = False # Malformed triple
             elif score_str.startswith("D"):
                  if len(score_str) > 1 and score_str[1:].isdigit():
                     num = int(score_str[1:])
+                    # D25 is Bullseye (50)
                     if 1 <= num <= 20 or num == 25:
                         value = num * 2
                         is_double = True
                     else:
-                        is_valid = False
+                        is_valid = False # Invalid double number
                  else:
-                    is_valid = False
+                    is_valid = False # Malformed double
             elif score_str.isdigit():
                 num = int(score_str)
+                 # Single 1-20 or 25 (outer bull)
                 if 0 <= num <= 20 or num == 25:
                     value = num
-                elif num == 50:
-                    st.toast("Use D25")
+                elif num == 50: # Disallow direct 50 input
+                    st.toast("Use D25 for Bullseye")
                     is_valid = False
-                    value = 0
+                    value = 0 # Set value to 0 if invalid direct 50
                 else:
-                    is_valid = False
+                    is_valid = False # Invalid single number
             else:
-                is_valid = False
+                is_valid = False # Not T, D, or digit
         except ValueError:
             is_valid = False
+        # Return tuple
         return value, is_double, is_triple, is_valid
+
     def get_throw_value(throw_str):
-            """Gets the integer score value for a throw string (e.g., 'T20' -> 60)."""
-            # Reuse parse_score_input to get the value and validity
-            value, _, _, is_valid = parse_score_input(throw_str)
-            # Return the value if the format was valid, otherwise return 0
-            # Returning 0 helps prevent errors in get_checkouts if somehow an invalid string gets there
-            return value if is_valid else 0
+        """Gets the integer score value for a throw string (e.g., 'T20' -> 60)."""
+        value, _, _, is_valid = parse_score_input(throw_str)
+        # Return 0 if the parse determined the format was invalid
+        if is_valid:
+            return value
+        else:
+            return 0
+
     def calculate_turn_total(shots_list):
+        """Calculates total score, darts thrown, and last dart double status for a list of shots."""
         total = 0
         darts_thrown_turn = 0
         last_dart_double_flag = False
         parsed_shots_details = []
         if not shots_list:
-            return 0, 0, False, []
+            return 0, 0, False, [] # Return defaults for empty list
+
         for i, shot_str in enumerate(shots_list):
             value, is_double, _, is_valid = parse_score_input(shot_str)
             if not is_valid:
-                return None, 0, False, [] # Signal error
+                # Signal error back to caller if any shot is invalid
+                return None, 0, False, []
             total += value
             darts_thrown_turn += 1
-            last_dart_double_flag = is_double
+            last_dart_double_flag = is_double # Status of the current dart processed
             parsed_shots_details.append({"input": shot_str, "value": value, "is_double": is_double})
+
+        # Return calculated totals and details
         return total, darts_thrown_turn, last_dart_double_flag, parsed_shots_details
 
     def run_turn_processing(player_name, shots_list):
-        global users
+        """Processes the end of a turn: updates scores, stats, logs, and determines next state."""
+        global users # Needed to modify the global users dictionary
         current_time_str = time.strftime("%Y-%m-%d %H:%M:%S")
         current_player_index_before_turn = st.session_state.current_player_index
         score_before_turn = st.session_state.player_scores[player_name]
+
         # Store state BEFORE processing for potential UNDO
         st.session_state.state_before_last_turn = {
-            "player_index": current_player_index_before_turn, "player_name": player_name,
+            "player_index": current_player_index_before_turn,
+            "player_name": player_name,
             "score_before": score_before_turn,
             "darts_thrown_player_before": st.session_state.player_darts_thrown.get(player_name, 0),
             "current_turn_shots_processed": list(shots_list),
             "legs_won_before": st.session_state.player_legs_won.get(player_name, 0),
             "sets_won_before": st.session_state.player_sets_won.get(player_name, 0),
         }
+
         calculated_score, darts_thrown_turn, last_dart_double, _ = calculate_turn_total(shots_list)
+
+        # Handle potential calculation error (e.g., invalid shot string somehow passed)
         if calculated_score is None:
-            st.error("Internal Error score calc.")
-            st.session_state.state_before_last_turn = None # Clear undo state on error
-            return # Stop processing
+            st.error("Internal Error: Score calculation failed during turn processing.")
+            st.session_state.state_before_last_turn = None # Invalidate undo state
+            return # Stop processing this turn
 
         new_score = score_before_turn - calculated_score
-        is_bust, is_win, valid_checkout_attempt = False, False, True
+        is_bust = False
+        is_win = False
+        valid_checkout_attempt = True
         turn_result_for_log = "UNKNOWN"
 
+        # --- Determine Turn Result ---
         # 1. Check Bust
         if new_score < 0 or new_score == 1:
             turn_result_for_log = "BUST"
             st.warning(f"❌ Bust! Score remains {score_before_turn}")
+            # Score does not change in session state for bust
             st.session_state.player_scores[player_name] = score_before_turn
             st.session_state.message = f"{player_name} Busted!"
-            st.session_state.player_turn_history.setdefault(player_name, []).append((calculated_score, darts_thrown_turn, turn_result_for_log))
+            # Add simple history entry
+            st.session_state.player_turn_history.setdefault(player_name, []).append(
+                (calculated_score, darts_thrown_turn, turn_result_for_log)
+            )
+            # Update display of last shots
             st.session_state.player_last_turn_scores[player_name] = list(shots_list)
+            # Update darts thrown count
             st.session_state.player_darts_thrown[player_name] = st.session_state.player_darts_thrown.get(player_name, 0) + darts_thrown_turn
             is_bust = True
 
         # 2. Check Win
         elif new_score == 0:
+            # Check if checkout attempt is valid based on game rules
             if st.session_state.check_out_mode == "Double Out" and not last_dart_double:
+                # Invalid Double Out -> Treat as Bust
                 turn_result_for_log = "BUST (Invalid Checkout)"
-                st.warning(f"❌ Invalid Checkout! Score remains {score_before_turn}")
-                st.session_state.player_scores[player_name] = score_before_turn
+                st.warning(f"❌ Invalid Checkout! Must finish on a Double. Score remains {score_before_turn}")
+                st.session_state.player_scores[player_name] = score_before_turn # Reset score
                 st.session_state.message = f"{player_name} Invalid Checkout!"
-                st.session_state.player_turn_history.setdefault(player_name, []).append((calculated_score, darts_thrown_turn, turn_result_for_log))
+                st.session_state.player_turn_history.setdefault(player_name, []).append(
+                    (calculated_score, darts_thrown_turn, turn_result_for_log)
+                )
                 st.session_state.player_last_turn_scores[player_name] = list(shots_list)
                 st.session_state.player_darts_thrown[player_name] = st.session_state.player_darts_thrown.get(player_name, 0) + darts_thrown_turn
-                is_bust = True
-                valid_checkout_attempt = False
-            else: # Valid Win
+                is_bust = True # Treat as bust for turn advancement
+                valid_checkout_attempt = False # Mark attempt as invalid
+            else:
+                # Valid Win
                 turn_result_for_log = "WIN"
-                st.success(f"🎯 Leg {st.session_state.current_leg} Won!")
-                st.session_state.player_scores[player_name] = 0
-                st.session_state.message = f"{player_name} won Leg!"
-                st.session_state.player_turn_history.setdefault(player_name, []).append((calculated_score, darts_thrown_turn, turn_result_for_log))
+                st.success(f"🎯 Game Shot! {player_name} wins Leg {st.session_state.current_leg}!")
+                st.session_state.player_scores[player_name] = 0 # Set score to 0
+                st.session_state.message = f"{player_name} won Leg {st.session_state.current_leg}!"
+                st.session_state.player_turn_history.setdefault(player_name, []).append(
+                    (calculated_score, darts_thrown_turn, turn_result_for_log)
+                )
                 st.session_state.player_last_turn_scores[player_name] = list(shots_list)
                 st.session_state.player_darts_thrown[player_name] = st.session_state.player_darts_thrown.get(player_name, 0) + darts_thrown_turn
                 st.session_state.leg_over = True
                 is_win = True
+                # Increment leg count in session state for immediate display/checks
                 st.session_state.player_legs_won[player_name] = st.session_state.player_legs_won.get(player_name, 0) + 1
 
         # 3. Regular Score Update
         else:
             turn_result_for_log = "OK"
             st.session_state.player_scores[player_name] = new_score
-            st.session_state.message = f"{player_name} scored {calculated_score}."
-            st.session_state.player_turn_history.setdefault(player_name, []).append((calculated_score, darts_thrown_turn, turn_result_for_log))
+            st.session_state.message = f"{player_name} scored {calculated_score}. {new_score} left."
+            st.session_state.player_turn_history.setdefault(player_name, []).append(
+                (calculated_score, darts_thrown_turn, turn_result_for_log)
+            )
             st.session_state.player_last_turn_scores[player_name] = list(shots_list)
             st.session_state.player_darts_thrown[player_name] = st.session_state.player_darts_thrown.get(player_name, 0) + darts_thrown_turn
 
-        # --- Logging Check ---
+        # --- Detailed Logging for Checkouts / Busts under 171 ---
         is_finish_attempt_score = (2 <= score_before_turn <= 170 and score_before_turn not in BOGIE_NUMBERS_SET)
+        # Log WINs or relevant BUSTs that occurred during a finish attempt
         if is_finish_attempt_score and turn_result_for_log != "OK":
             try:
                 log_entry = {
-                    "timestamp": current_time_str, "player": player_name, "score_before": score_before_turn,
-                    "shots": list(shots_list), "calculated_score": calculated_score, "result": turn_result_for_log,
+                    "timestamp": current_time_str,
+                    "player": player_name,
+                    "score_before": score_before_turn,
+                    "shots": list(shots_list),
+                    "calculated_score": calculated_score,
+                    "result": turn_result_for_log,
                     "last_dart_was_double": last_dart_double if turn_result_for_log == "WIN" else None,
-                    "last_dart_str": shots_list[-1] if shots_list else None, "game_mode": st.session_state.game_mode,
-                    "leg": st.session_state.current_leg, "set": st.session_state.current_set
+                    "last_dart_str": shots_list[-1] if shots_list else None,
+                    "game_mode": st.session_state.game_mode,
+                    "leg": st.session_state.current_leg,
+                    "set": st.session_state.current_set
                 }
                 current_username_log = st.session_state.username
+                # Safely append to log list, creating if necessary
                 log_list = users[current_username_log].setdefault("checkout_log", [])
                 log_list.append(log_entry)
+                # Optional: feedback for debugging
+                # st.toast(f"Logged checkout attempt: {turn_result_for_log}")
             except Exception as e:
                 st.error(f"Log Error: {e}")
+                # Continue execution even if logging fails
 
-        # --- Save Stats ---
+        # --- Update Persistent Stats ---
         current_username = st.session_state.username # Define for consistency
-        if player_name in users[current_username]["player_stats"]:
+        if player_name in users.get(current_username, {}).get("player_stats", {}):
             stats = users[current_username]["player_stats"][player_name]
+            # Use .get() with default 0 for safe incrementing
             if is_bust and turn_result_for_log.startswith("BUST"):
                  stats["num_busts"] = stats.get("num_busts", 0) + 1
-            # Legs/Sets won stats are updated during advancement checks below
+            # Legs/Sets won stats are updated during advancement checks below, avoid double count here
+            # if is_win: stats["legs_won"] = stats.get("legs_won", 0) + 1 # Handled below
+
+            # Common updates for any valid turn completion (bust, win, ok)
             if is_bust or is_win or turn_result_for_log == "OK":
                 stats["total_turns"] = stats.get("total_turns", 0) + 1
                 stats["darts_thrown"] = stats.get("darts_thrown", 0) + darts_thrown_turn
                 # Only add score if not a bust
                 if not is_bust and calculated_score is not None:
                     stats["total_score"] = stats.get("total_score", 0) + calculated_score
+            # Update highest score if applicable
             if calculated_score is not None and calculated_score > stats.get("highest_score", 0):
                  stats["highest_score"] = calculated_score
-        save_users(users) # Save after all updates
+        # Save users data once after all potential updates for the turn
+        save_users(users)
 
-        # --- Post-Turn Advancement ---
+        # --- Post-Turn Advancement Logic ---
         num_players_adv = len(st.session_state.players_selected_for_game)
-        should_advance_turn = is_bust or is_win or (len(shots_list) == 3)
-        if not valid_checkout_attempt and new_score == 0:
+        # Turn advances if bust, win, or 3 darts thrown, EXCEPT on invalid checkout bust
+        should_advance_turn = (is_bust or is_win or (len(shots_list) == 3))
+        if not valid_checkout_attempt and new_score == 0: # Special case: invalid checkout doesn't advance turn
             should_advance_turn = False
+            st.warning("Correct score and try checkout again.") # Add message
 
         if should_advance_turn:
             index_before_advance = st.session_state.current_player_index
+            # Final update to undo state before clearing/advancing
             if st.session_state.state_before_last_turn:
                 st.session_state.state_before_last_turn["player_index"] = index_before_advance
-            st.session_state.current_turn_shots = [] # Clear input list first
 
-            if st.session_state.leg_over:
+            # Clear the input buffer for the next turn/player
+            st.session_state.current_turn_shots = []
+
+            # --- Check Leg / Set / Game End ---
+            if st.session_state.leg_over: # True if is_win was true
                 legs_needed = math.ceil((st.session_state.legs_to_play + 1) / 2) if st.session_state.set_leg_rule == "Best of" else st.session_state.legs_to_play
-                if st.session_state.player_legs_won.get(player_name, 0) >= legs_needed: # Set Win check
+                # Check for Set Win
+                if st.session_state.player_legs_won.get(player_name, 0) >= legs_needed:
                     st.session_state.set_over = True
                     st.session_state.player_sets_won[player_name] = st.session_state.player_sets_won.get(player_name, 0) + 1
                     st.success(f"🎉 {player_name} wins Set {st.session_state.current_set}!")
                     # Save set win stat
                     if player_name in users[current_username]["player_stats"]:
                         users[current_username]["player_stats"][player_name]["sets_won"] = users[current_username]["player_stats"][player_name].get("sets_won",0)+1
-                        save_users(users)
+                        save_users(users) # Save immediately after stat update
+
+                    # Check for Game Win
                     sets_needed = math.ceil((st.session_state.sets_to_play + 1) / 2) if st.session_state.set_leg_rule == "Best of" else st.session_state.sets_to_play
-                    if st.session_state.player_sets_won.get(player_name, 0) >= sets_needed: # Game Win check
+                    if st.session_state.player_sets_won.get(player_name, 0) >= sets_needed:
                         st.session_state.game_over = True
                         st.session_state.winner = player_name
-                        # Update final game stats
+                        # Update final game stats for all players
                         for p in st.session_state.players_selected_for_game:
                              if p in users[current_username]["player_stats"]:
-                                 stats_p=users[current_username]["player_stats"][p]
+                                 stats_p = users[current_username]["player_stats"][p]
                                  stats_p["games_played"] = stats_p.get("games_played", 0) + 1
                                  if p == player_name:
                                      stats_p["games_won"] = stats_p.get("games_won", 0) + 1
-                        save_users(users)
-                        st.session_state.state_before_last_turn = None
-                    else: # Next Set prep
+                        save_users(users) # Save final game stats
+                        st.session_state.state_before_last_turn = None # Cannot undo after game over
+                        # Don't change player index, game over screen shows
+
+                    else: # Game not over -> Start Next Set
                         st.info("Prepare for next Set...")
                         time.sleep(1.5)
                         st.session_state.current_set += 1
                         st.session_state.current_leg = 1
                         st.session_state.player_scores = {p: st.session_state.starting_score for p in st.session_state.players_selected_for_game}
-                        st.session_state.player_legs_won = {p: 0 for p in st.session_state.players_selected_for_game}
+                        st.session_state.player_legs_won = {p: 0 for p in st.session_state.players_selected_for_game} # Reset legs
                         st.session_state.player_last_turn_scores = {p: [] for p in st.session_state.players_selected_for_game}
-                        st.session_state.leg_over = False
+                        st.session_state.leg_over = False # Reset flags
                         st.session_state.set_over = False
+                        # Alternate starting player for the new set
                         st.session_state.current_player_index = (index_before_advance + 1) % num_players_adv
-                        st.session_state.state_before_last_turn = None
-                else: # Next Leg prep
+                        st.session_state.state_before_last_turn = None # Clear undo state on set transition
+
+                else: # Leg over, but Set not over -> Start Next Leg
                     st.info("Prepare for next Leg...")
                     time.sleep(1.5)
                     st.session_state.current_leg += 1
                     st.session_state.player_scores = {p: st.session_state.starting_score for p in st.session_state.players_selected_for_game}
                     st.session_state.player_last_turn_scores = {p: [] for p in st.session_state.players_selected_for_game}
-                    st.session_state.leg_over = False
+                    st.session_state.leg_over = False # Reset flag
+                    # Alternate starting player for the new leg
                     st.session_state.current_player_index = (index_before_advance + 1) % num_players_adv
-                    st.session_state.state_before_last_turn = None
+                    st.session_state.state_before_last_turn = None # Clear undo state on leg transition
             else: # Leg not over, just advance player
                 st.session_state.current_player_index = (index_before_advance + 1) % num_players_adv
-                # Keep undo state
+                # Keep undo state available from beginning of this function call
 
-            st.rerun() # Rerun happens after state changes
+            st.rerun() # Rerun AFTER all state updates and advancement logic
 
     # --- Checkout Calculation Function ---
     @st.cache_data(ttl=3600)
@@ -797,50 +864,76 @@ elif st.session_state.current_page == "Game":
         if darts_left not in [1, 2, 3] or target_score < 2 or target_score > 170 or target_score in BOGIE_NUMBERS_SET:
             return []
         valid_paths = []
-        # Simplified throw priority
-        throws_priority = ( [f"T{i}" for i in range(20, 10, -1)] + ["T20", "T19"] +
-                            [f"D{i}" for i in range(20, 10, -1)] + ["D20", "D16", "D8", "D18", "D12", "D4", "D10", "D5", "D25"] +
-                            [str(i) for i in range(20, 10, -1)] + ["25"] +
-                            [f"T{i}" for i in range(10, 0, -1)] +
-                            [f"D{i}" for i in range(10, 0, -1)] +
-                            [str(i) for i in range(10, 0, -1)] )
+        # Define throw priorities
+        throws_priority = (
+            [f"T{i}" for i in range(20, 0, -1)] +
+            [f"D{i}" for i in range(20, 0, -1)] + ["D25"] +
+            [str(i) for i in range(20, 0, -1)] + ["25"]
+        )
         # --- 1 Dart Left ---
         if darts_left == 1:
             if (target_score <= 40 and target_score % 2 == 0) or target_score == 50:
                 double = f"D{target_score // 2}" if target_score != 50 else "D25"
                 return [[double]]
-            else: return []
+            else:
+                return []
         # --- 2 Darts Left ---
         if darts_left >= 2:
             for throw1 in throws_priority:
                 val1 = get_throw_value(throw1)
+                # Check validity and if remaining score is possible for 1 dart checkout
                 if 0 < val1 < target_score and (target_score - val1) >= 2:
                     remaining_score1 = target_score - val1
-                    one_dart_finish_list = get_checkouts(remaining_score1, 1)
+                    one_dart_finish_list = get_checkouts(remaining_score1, 1) # Recursive call
                     if one_dart_finish_list:
                          path = [throw1, one_dart_finish_list[0][0]]
                          if path not in valid_paths:
                              valid_paths.append(path)
-                             if len(valid_paths) >= max_suggestions: break
+                             # Early exit if max suggestions reached
+                             if len(valid_paths) >= max_suggestions:
+                                 break
+            # Return now if we only needed 2 darts or found enough suggestions
             if len(valid_paths) >= max_suggestions or darts_left == 2:
-                 return valid_paths[:max_suggestions]
+                return valid_paths[:max_suggestions]
         # --- 3 Darts Left ---
+        # Only continue if darts_left is 3 and we need more suggestions
         if darts_left == 3:
              for throw1 in throws_priority:
                  val1 = get_throw_value(throw1)
+                 # Check if valid first dart, leaving score finishable in 2 darts (min 4)
                  if 0 < val1 <= target_score - 4:
                      remaining_score1 = target_score - val1
+                     # Find ONE valid 2-dart finish for the remainder
                      two_dart_finishes = get_checkouts(remaining_score1, 2, max_suggestions=1)
                      if two_dart_finishes:
                          full_path = [throw1] + two_dart_finishes[0]
                          if full_path not in valid_paths:
                               valid_paths.append(full_path)
-                              if len(valid_paths) >= max_suggestions: break
-                 if len(valid_paths) >= max_suggestions: break
+                              if len(valid_paths) >= max_suggestions:
+                                  break # Break inner loop (over throw2 implicitly found)
+                 if len(valid_paths) >= max_suggestions:
+                     break # Break outer loop (over throw1)
+        # Return whatever paths were found, up to the max limit
         return valid_paths[:max_suggestions]
 
+    # --- Setup Shot Calculation Function ---
+    def get_setup_shot(current_score):
+        """Suggests a single dart throw to leave a preferred double."""
+        preferred_leaves = [32, 40, 16, 8, 36, 20, 4, 50, 24, 12, 6, 10, 18, 2, 28, 34]
+        # Try leaving a preferred double via a single
+        for target_leave in preferred_leaves:
+            needed_score = current_score - target_leave
+            if 1 <= needed_score <= 20 or needed_score == 25:
+                if target_leave >= 2: # Ensure leave is valid
+                     return f"Setup: {needed_score} (leaves {target_leave})"
+        # Fallback: Suggest highest single that leaves > 1
+        for single_hit in range(20, 0, -1):
+            if current_score > single_hit and (current_score - single_hit) > 1:
+                 return f"Setup: {single_hit} (leaves {current_score - single_hit})"
+        return None # No simple setup found
+
     def sort_checkouts_by_preference(paths, preferred_doubles):
-        # ... (sort function definition - expanded) ...
+        """Sorts checkout paths, putting those ending in preferred doubles first."""
         preferred_paths = []
         other_paths = []
         for path in paths:
@@ -849,6 +942,27 @@ elif st.session_state.current_page == "Game":
             else:
                 other_paths.append(path)
         return preferred_paths + other_paths
+
+    # --- Check Game State ---
+    if st.session_state.game_over:
+        st.title("🎉 Game Over! 🎉")
+        if st.session_state.winner:
+            st.header(f"🏆 Winner: {st.session_state.winner} 🏆")
+        else:
+            st.header("Match finished.")
+        st.balloons()
+        if st.button("Play Again / New Game Setup", use_container_width=True):
+            st.session_state.current_page = "Homepage"
+            st.session_state.players_selected_for_game = []
+            st.rerun()
+        st.stop()
+
+    if not st.session_state.players_selected_for_game:
+         st.error("No players selected. Go to Homepage to start.")
+         if st.button("🏠 Back to Homepage", use_container_width=True):
+             st.session_state.current_page = "Homepage"
+             st.rerun()
+         st.stop()
 
     # --- Game Interface ---
     st.title(f"🎯 Game On: {st.session_state.game_mode} - Set {st.session_state.current_set}/{st.session_state.sets_to_play} | Leg {st.session_state.current_leg}/{st.session_state.legs_to_play}")
@@ -871,26 +985,39 @@ elif st.session_state.current_page == "Game":
                     col_score, col_stats = st.columns([2, 3])
                     with col_score:
                         actual_score = st.session_state.player_scores.get(player, st.session_state.starting_score)
-                        display_score_val, score_color = actual_score, "black"; is_potential_bust = False; partial_turn_score = 0;
+                        display_score_val, score_color = actual_score, "black"
+                        is_potential_bust = False
+                        partial_turn_score = 0
                         if is_current_player and st.session_state.current_turn_shots:
                             partial_turn_score_calc, _, _, _ = calculate_turn_total(st.session_state.current_turn_shots)
                             if partial_turn_score_calc is not None:
                                 partial_turn_score = partial_turn_score_calc
                                 temp_remaining_score = actual_score - partial_turn_score
-                                if temp_remaining_score < 0 or temp_remaining_score == 1: display_score_val, score_color, is_potential_bust = "BUST", "red", True
-                                elif temp_remaining_score >= 0: display_score_val = temp_remaining_score
+                                if temp_remaining_score < 0 or temp_remaining_score == 1:
+                                    display_score_val, score_color, is_potential_bust = "BUST", "red", True
+                                elif temp_remaining_score >= 0:
+                                    display_score_val = temp_remaining_score
                         st.markdown(f"<h2 style='text-align: center; font-size: 3em; margin-bottom: 0; color: {score_color}; line-height: 1.1;'>{display_score_val}</h2>", unsafe_allow_html=True)
                     with col_stats:
-                        darts = st.session_state.player_darts_thrown.get(player, 0); history = st.session_state.player_turn_history.get(player, []); total_score_thrown = sum(t[0] for t in history if len(t)>2 and t[2] != "BUST"); avg_3_dart = (total_score_thrown / darts * 3) if darts > 0 else 0.00; legs = st.session_state.player_legs_won.get(player, 0); sets = st.session_state.player_sets_won.get(player, 0);
+                        darts = st.session_state.player_darts_thrown.get(player, 0)
+                        history = st.session_state.player_turn_history.get(player, [])
+                        total_score_thrown = sum(t[0] for t in history if len(t)>2 and t[2] != "BUST")
+                        avg_3_dart = (total_score_thrown / darts * 3) if darts > 0 else 0.00
+                        legs = st.session_state.player_legs_won.get(player, 0)
+                        sets = st.session_state.player_sets_won.get(player, 0)
                         st.markdown(f"""<div style='text-align: left; font-size: 0.9em; padding-top: 15px;'>📊Avg: {avg_3_dart:.2f}<br>Legs: {legs} | Sets: {sets}</div>""", unsafe_allow_html=True)
 
                     turn_total_display = ""
-                    if is_current_player and partial_turn_score > 0 and not is_potential_bust: turn_total_display = f"({partial_turn_score} thrown)"
+                    if is_current_player and partial_turn_score > 0 and not is_potential_bust:
+                         turn_total_display = f"({partial_turn_score} thrown)"
                     st.markdown(f"<p style='text-align: center; font-size: 1.1em; color: blue; margin-bottom: 2px; height: 1.3em;'>{turn_total_display or '&nbsp;'}</p>", unsafe_allow_html=True)
-                    last_shots = st.session_state.player_last_turn_scores.get(player, []); last_turn_str = " ".join(map(str, last_shots)) if last_shots else "-"; last_turn_total, _, _, _ = calculate_turn_total(last_shots) if last_shots else (0,0,False, []);
+                    last_shots = st.session_state.player_last_turn_scores.get(player, [])
+                    last_turn_str = " ".join(map(str, last_shots)) if last_shots else "-"
+                    last_turn_total, _, _, _ = calculate_turn_total(last_shots) if last_shots else (0,0,False, [])
                     st.markdown(f"<p style='text-align: center; font-size: 0.8em; color: grey; margin-bottom: 2px;'>Last: {last_turn_str} ({last_turn_total or 0})</p>", unsafe_allow_html=True)
 
-                    # --- Checkout Suggestions Display (uses player prefs) ---
+                    # --- Checkout / Setup Suggestions Display ---
+                    suggestion_text = None
                     if is_current_player and st.session_state.check_out_mode == "Double Out":
                         score_at_turn_start_disp = st.session_state.player_scores.get(player, st.session_state.starting_score)
                         current_turn_shots_list_disp = st.session_state.current_turn_shots
@@ -898,21 +1025,30 @@ elif st.session_state.current_page == "Game":
                         score_remaining_now_disp = score_at_turn_start_disp - (score_thrown_this_turn_disp if score_thrown_this_turn_disp is not None else 0)
                         darts_left_disp = 3 - darts_thrown_this_turn_disp
 
-                        if darts_left_disp > 0 and 2 <= score_remaining_now_disp <= 170 and score_remaining_now_disp not in BOGIE_NUMBERS_SET:
-                            raw_suggestions = get_checkouts(score_remaining_now_disp, darts_left_disp, max_suggestions=5)
-                            current_username_sugg = st.session_state.username
-                            # !! Load Player Specific Preferences !!
-                            player_prefs_list = users.get(current_username_sugg, {}).get("player_stats", {}).get(player, {}).get('preferred_doubles', [])
-                            preferred_doubles_set = set(player_prefs_list) if player_prefs_list else DEFAULT_PREFERRED_DOUBLES
-                            sorted_suggestions = sort_checkouts_by_preference(raw_suggestions, preferred_doubles_set)
+                        if darts_left_disp > 0 and score_remaining_now_disp >= 2:
+                            if score_remaining_now_disp <= 170 and score_remaining_now_disp not in BOGIE_NUMBERS_SET:
+                                raw_suggestions = get_checkouts(score_remaining_now_disp, darts_left_disp, max_suggestions=5)
+                                if raw_suggestions:
+                                    current_username_sugg = st.session_state.username
+                                    player_prefs_list = users.get(current_username_sugg, {}).get("player_stats", {}).get(player, {}).get('preferred_doubles', [])
+                                    preferred_doubles_set = set(player_prefs_list) if player_prefs_list else DEFAULT_PREFERRED_DOUBLES
+                                    sorted_suggestions = sort_checkouts_by_preference(raw_suggestions, preferred_doubles_set)
+                                    display_suggestions_list = [" ".join(path) for path in sorted_suggestions[:2]]
+                                    display_text = " | ".join(display_suggestions_list)
+                                    suggestion_text = f"<p style='text-align: center; font-size: 0.9em; color: green; margin-top: 5px;'>🎯 Out ({darts_left_disp}D): {display_text}</p>"
+                                elif darts_left_disp == 1: # No checkout, only 1 dart left -> Try setup
+                                    setup_suggestion = get_setup_shot(score_remaining_now_disp)
+                                    if setup_suggestion:
+                                        suggestion_text = f"<p style='text-align: center; font-size: 0.9em; color: orange; margin-top: 5px;'>🔧 **{setup_suggestion}**</p>"
 
-                            if sorted_suggestions:
-                                display_suggestions_list = [" ".join(path) for path in sorted_suggestions[:2]]
-                                display_text = " | ".join(display_suggestions_list)
-                                st.markdown(f"<p style='text-align: center; font-size: 0.9em; color: green; margin-top: 5px;'>🎯 Out ({darts_left_disp}D): {display_text}</p>", unsafe_allow_html=True)
+                            elif score_remaining_now_disp in BOGIE_NUMBERS_SET:
+                                 suggestion_text = "<p style='text-align: center; font-size: 0.8em; color: red; margin-top: 5px;'>No checkout</p>"
 
-                        elif score_remaining_now_disp in BOGIE_NUMBERS_SET:
-                             st.markdown("<p style='text-align: center; font-size: 0.8em; color: red; margin-top: 5px;'>No checkout</p>", unsafe_allow_html=True)
+                    # Display the suggestion text or a placeholder for consistent height
+                    if suggestion_text:
+                        st.markdown(suggestion_text, unsafe_allow_html=True)
+                    else:
+                         st.markdown("<p style='height: 1.9em; margin-top: 5px; margin-bottom: 0;'></p>", unsafe_allow_html=True) # Approx height of suggestion p
 
                     st.markdown("</div>", unsafe_allow_html=True) # Close player div
                 st.markdown("<div style='margin-bottom: 8px;'></div>", unsafe_allow_html=True) # Space between players
@@ -966,7 +1102,7 @@ elif st.session_state.current_page == "Game":
                     state = st.session_state.state_before_last_turn
                     undo_player_name = state["player_name"]
                     undo_player_index = state["player_index"]
-                    # Restore state values one by one
+                    # Restore state values
                     st.session_state.current_player_index = undo_player_index
                     st.session_state.player_scores[undo_player_name] = state["score_before"]
                     st.session_state.player_darts_thrown[undo_player_name] = state["darts_thrown_player_before"]
@@ -981,7 +1117,6 @@ elif st.session_state.current_page == "Game":
                     st.session_state.set_over = False
                     st.session_state.game_over = False
                     st.session_state.winner = None
-                    # Restore counts (important if win was undone)
                     st.session_state.player_legs_won[undo_player_name] = state["legs_won_before"]
                     st.session_state.player_sets_won[undo_player_name] = state["sets_won_before"]
                     st.session_state.pending_modifier = None
@@ -1032,16 +1167,22 @@ elif st.session_state.current_page == "Game":
                                          current_player_name_for_calc = st.session_state.players_selected_for_game[idx_safe]
 
                                     current_score_value, _, _, _ = calculate_turn_total(shots_so_far)
-                                    potential_score_after_turn = st.session_state.player_scores[current_player_name_for_calc] - (current_score_value if current_score_value is not None else 0)
-                                    is_potential_win = (potential_score_after_turn == 0)
-                                    _, last_dart_double_flag_check, _, _ = parse_score_input(final_shot_str)
-                                    is_valid_checkout = (st.session_state.check_out_mode != "Double Out" or last_dart_double_flag_check)
+                                    # Check if player exists before accessing score
+                                    if current_player_name_for_calc != "N/A":
+                                        potential_score_after_turn = st.session_state.player_scores[current_player_name_for_calc] - (current_score_value if current_score_value is not None else 0)
+                                        is_potential_win = (potential_score_after_turn == 0)
+                                        _, last_dart_double_flag_check, _, _ = parse_score_input(final_shot_str)
+                                        is_valid_checkout = (st.session_state.check_out_mode != "Double Out" or last_dart_double_flag_check)
 
-                                    if num_darts_now == 3 or (is_potential_win and is_valid_checkout):
-                                        run_turn_processing(current_player_name_for_calc, shots_so_far)
-                                        # run_turn_processing handles rerun
+                                        # Process turn if 3 darts OR valid win
+                                        if num_darts_now == 3 or (is_potential_win and is_valid_checkout):
+                                            run_turn_processing(current_player_name_for_calc, shots_so_far)
+                                            # run_turn_processing handles rerun
+                                        else:
+                                            st.rerun() # Rerun to update live score etc.
                                     else:
-                                        st.rerun() # Rerun to update live score etc.
+                                         st.error("Error: Could not determine current player for score calculation.")
+
             st.markdown("---")
 
         else: # If game is over
