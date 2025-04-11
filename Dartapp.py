@@ -446,6 +446,17 @@ elif st.session_state.current_page == "⚙️ Settings":
     st.title("⚙️ Settings & Player Management")
     st.write(f"Manage players and preferences for account: **{st.session_state.username}**")
     st.markdown("---")
+    # 🌐 Language Settings
+    with st.expander("🌐 Language Settings"):
+        selected_lang = st.selectbox(
+            "Select Language",
+            options=["en", "de"],
+            index=["en", "de"].index(st.session_state.get("language", "en")),
+            format_func=lambda x: "English" if x == "en" else "Deutsch",
+        )
+        st.session_state.language = selected_lang
+        st.markdown(f"{t('selected_language')} **{selected_lang.upper()}**")
+
 
     current_username = st.session_state.username
     # Ensure user exists and has player_stats key before proceeding
