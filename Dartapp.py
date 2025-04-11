@@ -371,9 +371,17 @@ if st.session_state.current_page == "Homepage":
                         player_stats_dict_add = users[current_username_hp].setdefault("player_stats", {})
                         if new_player_name_from_input not in player_stats_dict_add:
                             player_stats_dict_add[new_player_name_from_input] = {
-                                "games_played": 0, "games_won": 0, "legs_won": 0, "sets_won": 0,
-                                "total_score": 0, "highest_score": 0, "total_turns": 0,
-                                "num_busts": 0, "darts_thrown": 0, "preferred_doubles": [] # Add prefs list
+                                "games_played": 0,
+                                "games_won": 0,
+                                "legs_won": 0,
+                                "sets_won": 0,
+                                "total_score": 0,
+                                "highest_score": 0,
+                                "total_turns": 0,
+                                "num_busts": 0,
+                                "darts_thrown": 0,
+                                "preferred_doubles": [],
+                                "avatar": "🎯"  # Default Emoji
                             }
                             save_users(users)
                             st.success(f"Player '{new_player_name_from_input}' added.")
@@ -530,58 +538,76 @@ elif st.session_state.current_page == "⚙️ Settings":
     tab_prefs, tab_delete = st.tabs(["🎯 Set Preferences", "🗑️ Delete Player"])
 
     with tab_prefs:
-        st.subheader("Set Preferred Double Outs")
-        st.write("Select preferred doubles for checkout suggestions for each player.")
+    st.subheader("Set Preferred Double Outs & Avatars")
+    st.write("Select preferred doubles and an emoji avatar for each player.")
 
-        if not players_list:
-            st.warning("No players added yet. Add players on the Homepage.")
-        else:
-            # Select Player to Edit
-            player_to_edit = st.selectbox(
-                "Select Player to Edit Preferences:",
-                players_list,
-                key="edit_prefs_player_select",
-                index=None,
-                placeholder="Choose player..."
+    if not players_list:
+        st.warning("No players added yet. Add players on the Homepage.")
+    else:
+        # Select Player to Edit
+        player_to_edit = st.selectbox(
+            "Select Player to Edit Preferences:",
+            players_list,
+            key="edit_prefs_player_select",
+            index=None,
+            placeholder="Choose player..."
+        )
+
+        # --- Initialize variable BEFORE potentially using it ---
+        current_preferences_formatted = []  # Default to empty list
+
+        # --- Emoji options ---
+        emoji_options = ["🎯", "🔥", "🎉", "💥", "👑", "⚡", "🥇", "😎"]
+
+        # --- Calculate actual prefs only if a player is selected ---
+        if player_to_edit:
+            # Load current preferences safely using .get()
+            current_prefs = player_stats_dict.get(player_to_edit, {}).get('preferred_doubles', [])
+            # Ensure loaded preferences are valid doubles before displaying
+            current_preferences_formatted = [pref for pref in current_prefs if pref in ALL_POSSIBLE_DOUBLES]
+
+            # Load current avatar emoji, default to 🎯
+            current_avatar = player_stats_dict[player_to_edit].get("avatar", "🎯")
+
+            # Add Emoji selection dropdown
+            selected_avatar = st.selectbox(
+                f"Select avatar for **{player_to_edit}**:",
+                emoji_options,
+                index=emoji_options.index(current_avatar) if current_avatar in emoji_options else 0
             )
+            st.caption("Choose an emoji to represent this player in games and stats 📊🎯")
 
-            # --- Initialize variable BEFORE potentially using it ---
-            current_preferences_formatted = [] # Default to empty list
+        # --- Disable multiselect and button if no player is chosen ---
+        input_disabled = (player_to_edit is None)
 
-            # --- Calculate actual prefs only if a player is selected ---
+        # Display multiselect using the initialized/calculated preferences
+        selected_doubles = st.multiselect(
+            f"Select preferred doubles for **{player_to_edit or '...'}**:",  # Handle label if None
+            options=ALL_POSSIBLE_DOUBLES,
+            default=current_preferences_formatted,
+            key=f"pref_doubles_multiselect_{player_to_edit or 'none'}",  # Unique key part
+            disabled=input_disabled
+        )
+
+        # Display Save button, disable if needed
+        save_button_label = f"Save Preferences for {player_to_edit}" if player_to_edit else "Save Preferences"
+        if st.button(save_button_label, type="primary", key=f"save_prefs_{player_to_edit or 'none'}", disabled=input_disabled):
+            # Check again if player_to_edit is valid before saving
             if player_to_edit:
-                # Load current preferences safely using .get()
-                current_prefs = player_stats_dict.get(player_to_edit, {}).get('preferred_doubles', [])
-                # Ensure loaded preferences are valid doubles before displaying
-                current_preferences_formatted = [pref for pref in current_prefs if pref in ALL_POSSIBLE_DOUBLES]
+                # Ensure player still exists and stats dict is there before saving
+                if player_to_edit in users[current_username].get("player_stats", {}):
+                    # ✅ Save doubles
+                    users[current_username]["player_stats"][player_to_edit]['preferred_doubles'] = selected_doubles
+                    # ✅ Save avatar
+                    users[current_username]["player_stats"][player_to_edit]["avatar"] = selected_avatar
+                    save_users(users)
+                    st.success(f"Preferences saved for {player_to_edit}!")
+                    time.sleep(1)
+                    # No rerun usually needed here, state is saved
+                else:
+                    st.error("Player not found, could not save preferences (maybe deleted?).")
+            # else: Button should be disabled if player_to_edit is None
 
-            # --- Disable multiselect and button if no player is chosen ---
-            input_disabled = (player_to_edit is None)
-
-            # Display multiselect using the initialized/calculated preferences
-            selected_doubles = st.multiselect(
-                f"Select preferred doubles for **{player_to_edit or '...'}**:", # Handle label if None
-                options=ALL_POSSIBLE_DOUBLES,
-                default=current_preferences_formatted,
-                key=f"pref_doubles_multiselect_{player_to_edit or 'none'}", # Unique key part
-                disabled=input_disabled
-            )
-
-            # Display Save button, disable if needed
-            save_button_label = f"Save Preferences for {player_to_edit}" if player_to_edit else "Save Preferences"
-            if st.button(save_button_label, type="primary", key=f"save_prefs_{player_to_edit or 'none'}", disabled=input_disabled):
-                 # Check again if player_to_edit is valid before saving
-                if player_to_edit:
-                    # Ensure player still exists and stats dict is there before saving
-                    if player_to_edit in users[current_username].get("player_stats", {}):
-                         users[current_username]["player_stats"][player_to_edit]['preferred_doubles'] = selected_doubles
-                         save_users(users)
-                         st.success(f"Preferences saved for {player_to_edit}!")
-                         time.sleep(1)
-                         # No rerun usually needed here, state is saved
-                    else:
-                         st.error("Player not found, could not save preferences (maybe deleted?).")
-                # else: Button should be disabled if player_to_edit is None
 
     with tab_delete:
         st.subheader("Delete Player Data")
