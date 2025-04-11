@@ -30,7 +30,7 @@ translations = {
     "start_game_button": {"de": "🎯 Spiel starten", "en": "🎯 Start Game"},
     "configure_game": {"de": "Spiel konfigurieren,", "en": "Configure game,"},
 
-    # Game Page spezifische Übersetzungen
+    # Game Page
     "game_on": {"de": "Spiel läuft", "en": "Game On"},
     "set": {"de": "Satz", "en": "Set"},
     "leg": {"de": "Leg"},
@@ -50,12 +50,31 @@ translations = {
     "game_over_start_new": {"de": "Spiel vorbei. Neues Spiel starten.", "en": "Game over. Start new game."},
     "invalid_page_state": {"de": "Ungültiger Seitenstatus.", "en": "Invalid page state."},
 
-    # Optional für später noch übersichtlich (Statistik etc.)
+    # Statistics Page
     "select_statistic": {"de": "Statistik auswählen:", "en": "Select Statistic:"},
     "stats_for_account": {"de": "Statistiken für Konto:", "en": "Stats for account:"},
     "no_data_selected_stat": {"de": "Keine Daten für gewählte Statistik.", "en": "No data for selected statistic."},
     "visualizations_placeholder": {"de": "Visualisierungen (Platzhalter)", "en": "Visualizations (Placeholder)"},
     "charts_coming_soon": {"de": "Diagramme folgen bald.", "en": "Charts coming soon."},
+
+    # Settings Page
+    "settings_title": {"de": "⚙️ Einstellungen & Spieler-Verwaltung", "en": "⚙️ Settings & Player Management"},
+    "manage_players_prefs": {"de": "Verwalte Spieler und Einstellungen für Konto:", "en": "Manage players and preferences for account:"},
+    "set_preferences": {"de": "🎯 Einstellungen festlegen", "en": "🎯 Set Preferences"},
+    "delete_player": {"de": "🗑️ Spieler löschen", "en": "🗑️ Delete Player"},
+    "set_preferred_double_outs": {"de": "Bevorzugte Doppel für Checkouts festlegen", "en": "Set Preferred Double Outs"},
+    "select_player_edit_prefs": {"de": "Wähle Spieler für Einstellungen:", "en": "Select Player to Edit Preferences:"},
+    "save_preferences": {"de": "Einstellungen speichern", "en": "Save Preferences"},
+    "delete_player_data": {"de": "Spielerdaten löschen", "en": "Delete Player Data"},
+    "delete_warning": {"de": "⚠️ Löschen entfernt alle Statistiken und Checkout-Logs dauerhaft!", "en": "⚠️ Deleting removes all stats and checkout logs permanently!"},
+    "no_players_added": {"de": "Noch keine Spieler hinzugefügt.", "en": "No players added yet."},
+    "player_deleted_success": {"de": "Spieler erfolgreich gelöscht.", "en": "Player deleted successfully."},
+    "confirm_deletion": {"de": "Bestätigung für Löschen von", "en": "Confirm Deletion of"},
+    "yes_delete": {"de": "✔️ Ja, Spieler löschen", "en": "✔️ Yes, DELETE Player Data"},
+    "cancel": {"de": "❌ Abbrechen", "en": "❌ Cancel"},
+    "add_players_homepage": {"de": "Spieler auf der Startseite hinzufügen.", "en": "Add players on the Homepage."},
+    "no_players_delete": {"de": "Keine Spieler zum Löschen vorhanden.", "en": "No players to delete."},
+    "language_settings": {"de": "🌐 Spracheinstellungen", "en": "🌐 Language Settings"},
 }
 
 # Define helper function to fetch translation based on session state
