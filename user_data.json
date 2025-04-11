@@ -96,22 +96,39 @@
                 "games_won": 1,
                 "legs_won": 1,
                 "sets_won": 1,
-                "total_score": 162,
+                "total_score": 257,
                 "highest_score": 101,
-                "total_turns": 2,
+                "total_turns": 3,
                 "num_busts": 0,
-                "darts_thrown": 5
+                "darts_thrown": 8,
+                "preferred_doubles": [
+                    "D20",
+                    "D19",
+                    "D10",
+                    "D6",
+                    "D3",
+                    "D2",
+                    "D18",
+                    "D4",
+                    "D17"
+                ]
             },
             "Julien": {
                 "games_played": 1,
                 "games_won": 0,
                 "legs_won": 0,
                 "sets_won": 0,
-                "total_score": 59,
-                "highest_score": 59,
-                "total_turns": 1,
+                "total_score": 159,
+                "highest_score": 100,
+                "total_turns": 2,
                 "num_busts": 0,
-                "darts_thrown": 3
+                "darts_thrown": 6,
+                "preferred_doubles": [
+                    "D20",
+                    "D1",
+                    "D5",
+                    "D12"
+                ]
             }
         },
         "checkout_log": [
