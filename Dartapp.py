@@ -37,6 +37,7 @@ translations = {
     "statistics": {"de": "Statistiken", "en": "Statistics"},
     "settings": {"de": "Einstellungen", "en": "Settings"},
     "game": {"de": "Spiel", "en": "Game"},
+    "navigation": {"de": "Navigation", "en": "Navigation"},
     "homepage": {"de": "Startseite", "en": "Homepage"},
     "select_language": {"de": "Sprache wählen", "en": "Select Language"},
     "selected_language": {"de": "Gewählte Sprache:", "en": "Selected Language:"},
@@ -213,6 +214,8 @@ if not st.session_state.logged_in:
                 # Check password safely using .get()
                 hashed_input_pw = hash_password(password)
                 if username in users and users[username].get("password") == hashed_input_pw:
+                    print(f"Login successful: {username}")
+                    print(f"Current page: {st.session_state.current_page}")
                     st.session_state.logged_in = True
                     st.session_state.username = username
                     st.session_state.current_page = page_map.get("homepage", "Homepage")
@@ -277,7 +280,7 @@ st.sidebar.image(avatar_url, width=80)
 st.sidebar.markdown("---")
 
 # Page options 
-page_options = list(page_map.values())
+page_options = list(page_map.keys())
 
 # get the current index
 try:
@@ -297,6 +300,9 @@ chosen_page = st.sidebar.radio(
     key="nav_radio",
     disabled=nav_disabled
 )
+
+print(f"Login successful: {username}")
+print(f"Current page: {st.session_state.current_page}")
 
 # translation in internal page ID
 st.session_state.current_page = reverse_page_map.get(chosen_page, "homepage")
