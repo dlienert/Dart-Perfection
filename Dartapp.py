@@ -288,7 +288,9 @@ page_options = list(page_map.keys())
 
 # get the current index
 try:
-    current_page_index = list(page_map.keys()).index(st.session_state.current_page)
+    # ✅ Fix: Map internal page name back to visible name before using index
+    visible_page_name = reverse_page_map.get(st.session_state.current_page, "Homepage")
+    current_page_index = list(page_map.keys()).index(visible_page_name)
 except ValueError:
     current_page_index = 0
     st.session_state.current_page = page_map.get("Homepage", "homepage")
@@ -296,6 +298,9 @@ except ValueError:
 # deactivate navigation during the game
 nav_disabled = st.session_state.current_page == "Game" and not st.session_state.game_over
 
+#  Before rendering the radio, apply nav_target if exists
+if "nav_target" in st.session_state:
+    st.session_state["nav_radio"] = st.session_state.pop("nav_target")
 # Navigation
 chosen_page = st.sidebar.radio(
     t("navigation"),
@@ -305,7 +310,7 @@ chosen_page = st.sidebar.radio(
     disabled=nav_disabled
 )
 
-# Debug prints
+# 🪵 --- Debug Navigation ---
 print("🪵 --- Debug Navigation ---")
 print(f"✅ Debug: Login successful: {st.session_state.username}")
 print(f"✅ Debug: Chosen Page (visible name): {chosen_page}")
@@ -313,23 +318,26 @@ print(f"✅ Debug: Current internal page: {st.session_state.current_page}")
 print(f"✅ Debug: Navigation disabled: {nav_disabled}")
 print("🪵 -----------------------")
 
-# Transform into page ID
+# Transform visible page name into internal page ID
 internal_chosen_page = page_map.get(chosen_page, "homepage")
+print(f"✅ Debug: Internal page ID for chosen page: {internal_chosen_page}")
 
 # Handle navigation selection
 if internal_chosen_page != st.session_state.current_page:
+    print(f"✅ Debug: Page has changed → Changing to {internal_chosen_page}")
     if not nav_disabled:
         st.session_state.current_page = internal_chosen_page
         st.rerun()
     else:
-        # If disabled, reset the radio button visually if possible
-        # (May still show selection briefly due to Streamlit limitations)
-        st.sidebar.warning(t("finish_quit_game")
-)
+        print("🚫 Debug: Navigation is disabled, cannot change page.")
+        st.sidebar.warning(t("finish_quit_game"))
 # Handle direct navigation attempt to Game page when not started
 elif chosen_page == "Game" and st.session_state.current_page != "Game":
-     st.sidebar.warning(t("start_game_homepage"))
-     time.sleep(1)
+    print("🚫 Debug: Direct navigation to Game page without game started.")
+    st.sidebar.warning(t("start_game_homepage"))
+    time.sleep(1)
+else:
+    print("ℹ️ Debug: Page selection unchanged or no action needed.")
 
 
 if st.session_state.current_page == "Game" and not st.session_state.game_over:
@@ -479,8 +487,10 @@ if st.session_state.current_page == "homepage":
                 st.warning("⚠️ Select players.")
             elif not st.session_state.game_mode or st.session_state.game_mode not in [101, 201, 301, 401, 501]:
                 st.warning("⚠️ Select X01 mode.")
-            else: # Initialize Game State (Expanded)
+            else:
+                # ✅ Initialize game state
                 st.session_state.current_page = "Game"
+                st.session_state.nav_target = reverse_page_map.get("game", "Game")  # ✅ Sync sidebar
                 st.session_state.starting_score = st.session_state.game_mode
                 st.session_state.player_scores = {p: st.session_state.starting_score for p in players_to_start}
                 st.session_state.player_legs_won = {p: 0 for p in players_to_start}
@@ -499,10 +509,8 @@ if st.session_state.current_page == "homepage":
                 st.session_state.message = ""
                 st.session_state.pending_modifier = None
                 st.session_state.state_before_last_turn = None
-                st.success(f"Starting {st.session_state.game_mode}...")
-                st.info(f"Playing {st.session_state.set_leg_rule} {st.session_state.sets_to_play} set(s)...")
-                time.sleep(1.5)
-                st.rerun()
+
+                st.rerun()  # ✅ Immediate rerun
     with game_mode_tabs[1]:
         st.subheader("Cricket")
         st.info("🏏 Planned.")

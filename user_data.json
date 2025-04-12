@@ -163,15 +163,15 @@
         "password": "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5",
         "player_stats": {
             "Neel": {
-                "games_played": 7,
-                "games_won": 5,
+                "games_played": 8,
+                "games_won": 6,
                 "legs_won": 0,
-                "sets_won": 5,
-                "total_score": 1153,
+                "sets_won": 6,
+                "total_score": 1254,
                 "highest_score": 118,
-                "total_turns": 48,
+                "total_turns": 50,
                 "num_busts": 16,
-                "darts_thrown": 140,
+                "darts_thrown": 146,
                 "preferred_doubles": [],
                 "avatar": "\ud83c\udfaf"
             },
@@ -652,7 +652,25 @@
                 "game_mode": 101,
                 "leg": 1,
                 "set": 1
+            },
+            {
+                "timestamp": "2025-04-12 20:46:40",
+                "player": "Neel",
+                "score_before": 45,
+                "shots": [
+                    "14",
+                    "25",
+                    "6"
+                ],
+                "calculated_score": 45,
+                "result": "WIN",
+                "last_dart_was_double": false,
+                "last_dart_str": "6",
+                "game_mode": 101,
+                "leg": 1,
+                "set": 1
             }
-        ]
+        ],
+        "avatar_choice": "avataaars_hero1"
     }
 }
