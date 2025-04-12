@@ -591,8 +591,8 @@ elif st.session_state.current_page == "⚙️ Settings":
     tab_prefs, tab_delete = st.tabs(["🎯 Set Preferences", "🗑️ Delete Player"])
 
     with tab_prefs:
-    st.subheader("Set Preferred Double Outs & Avatars")
-    st.write("Select preferred doubles and an emoji avatar for each player.")
+        st.subheader("Set Preferred Double Outs & Avatars")
+        st.write("Select preferred doubles and an emoji avatar for each player.")
 
     if not players_list:
         st.warning("No players added yet. Add players on the Homepage.")
