@@ -189,15 +189,15 @@
                 "avatar": "\ud83c\udfaf"
             },
             "Tobias": {
-                "games_played": 2,
-                "games_won": 0,
+                "games_played": 3,
+                "games_won": 1,
                 "legs_won": 0,
-                "sets_won": 0,
-                "total_score": 166,
-                "highest_score": 50,
-                "total_turns": 4,
+                "sets_won": 1,
+                "total_score": 267,
+                "highest_score": 57,
+                "total_turns": 7,
                 "num_busts": 0,
-                "darts_thrown": 12,
+                "darts_thrown": 19,
                 "preferred_doubles": [],
                 "avatar": "\ud83c\udfaf"
             }
@@ -551,6 +551,21 @@
                 "result": "WIN",
                 "last_dart_was_double": false,
                 "last_dart_str": "14",
+                "game_mode": 101,
+                "leg": 1,
+                "set": 1
+            },
+            {
+                "timestamp": "2025-04-12 14:13:45",
+                "player": "Tobias",
+                "score_before": 9,
+                "shots": [
+                    "9"
+                ],
+                "calculated_score": 9,
+                "result": "WIN",
+                "last_dart_was_double": false,
+                "last_dart_str": "9",
                 "game_mode": 101,
                 "leg": 1,
                 "set": 1
