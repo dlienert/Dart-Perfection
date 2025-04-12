@@ -424,7 +424,7 @@ if st.session_state.current_page == "Homepage":
                                 "darts_thrown": 0,
                                 "preferred_doubles": [],
                                 # ✅ Avatar direkt mit abspeichern
-                                "avatar_url": f"https://api.dicebear.com/7.x/avataaars/png?seed={new_player_name_from_input}"
+                                "avatar_url": f"https://api.dicebear.com/8.x/avataaars/png?seed={new_player_name_from_input}"
                             }
                             save_users(users)
                             st.success(f"Player '{new_player_name_from_input}' added.")
@@ -1186,7 +1186,7 @@ elif st.session_state.current_page == "Game":
 
         for idx, player in enumerate(st.session_state.players_selected_for_game):
             with cols[idx]:
-                avatar_url = player_stats_gameover.get(player, {}).get("avatar_url", f"https://api.dicebear.com/7.x/avataaars/png?seed={player}")
+                avatar_url = player_stats_gameover.get(player, {}).get("avatar_url", f"https://api.dicebear.com/8.x/avataaars/png?seed={player}")
                 st.image(avatar_url, width=100)
                 st.markdown(f"**{player}**")
                 st.markdown(f"Sets Won: {st.session_state.player_sets_won.get(player, 0)}")

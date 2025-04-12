@@ -163,15 +163,15 @@
         "password": "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5",
         "player_stats": {
             "Neel": {
-                "games_played": 4,
-                "games_won": 2,
+                "games_played": 5,
+                "games_won": 3,
                 "legs_won": 0,
-                "sets_won": 2,
-                "total_score": 850,
+                "sets_won": 3,
+                "total_score": 951,
                 "highest_score": 118,
-                "total_turns": 40,
-                "num_busts": 14,
-                "darts_thrown": 118,
+                "total_turns": 43,
+                "num_busts": 15,
+                "darts_thrown": 127,
                 "preferred_doubles": [],
                 "avatar": "\ud83c\udfaf"
             },
@@ -566,6 +566,40 @@
                 "result": "WIN",
                 "last_dart_was_double": false,
                 "last_dart_str": "9",
+                "game_mode": 101,
+                "leg": 1,
+                "set": 1
+            },
+            {
+                "timestamp": "2025-04-12 15:05:51",
+                "player": "Neel",
+                "score_before": 44,
+                "shots": [
+                    "19",
+                    "19",
+                    "6"
+                ],
+                "calculated_score": 44,
+                "result": "BUST (Invalid Checkout)",
+                "last_dart_was_double": null,
+                "last_dart_str": "6",
+                "game_mode": 101,
+                "leg": 1,
+                "set": 1
+            },
+            {
+                "timestamp": "2025-04-12 15:06:14",
+                "player": "Neel",
+                "score_before": 44,
+                "shots": [
+                    "19",
+                    "19",
+                    "D3"
+                ],
+                "calculated_score": 44,
+                "result": "WIN",
+                "last_dart_was_double": true,
+                "last_dart_str": "D3",
                 "game_mode": 101,
                 "leg": 1,
                 "set": 1
