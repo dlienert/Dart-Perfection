@@ -6,7 +6,27 @@ import hashlib
 import pandas as pd
 import time
 import math # Needed for ceiling function in set/leg logic
+import requests
+import random
 
+# API for motivational quotes 
+def get_motivational_quote():
+    try:
+        response = requests.get("https://type.fit/api/quotes")
+        if response.status_code == 200:
+            quotes = response.json()
+            # Filter for motivational quotes (optional)
+            motivational_quotes = [q for q in quotes if "life" in q['text'].lower() or "success" in q['text'].lower() or "dream" in q['text'].lower()]
+            if motivational_quotes:
+                quote = random.choice(motivational_quotes)
+            else:
+                quote = random.choice(quotes)
+            return f"💡 *{quote['text']}* — **{quote.get('author', 'Unknown')}**"
+        else:
+            return "💡 Stay positive and keep going!"
+    except Exception as e:
+        return "💡 Keep aiming high!"
+    
 # --- Language Translation Setup ---
 
 # Define translation dictionary for app text
@@ -436,6 +456,11 @@ elif st.session_state.current_page == "Statistics":
     st.title(f"📊 {t('personal_statistics')}")
     st.write(f"{t('stats_for_account')}: **{st.session_state.username}**")
 
+    # 🏆 Motivation Booster
+    st.markdown("---")
+    st.subheader("🏆 Motivation Booster")
+    st.info(get_motivational_quote())
+    
     if "confirm_delete_player" not in st.session_state:
         st.session_state.confirm_delete_player = None
 
@@ -1132,6 +1157,10 @@ elif st.session_state.current_page == "Game":
     st.title(f"🎯 {t('game_on')}: {st.session_state.game_mode} - {t('set')} {st.session_state.current_set}/{st.session_state.sets_to_play} | {t('leg')} {st.session_state.current_leg}/{st.session_state.legs_to_play}")
     st.caption(f"{t('mode')}: {st.session_state.check_out_mode} | {t('rule')}: {st.session_state.set_leg_rule}")
 
+    # 🏆 Motivation Booster
+    st.markdown("---")
+    st.subheader("🏆 Motivation Booster")
+    st.info(get_motivational_quote())
 
     # --- Main Two-Column Layout ---
     left_col, right_col = st.columns([2, 1.2])
