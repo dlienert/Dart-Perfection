@@ -385,24 +385,6 @@ if st.session_state.current_page == "Homepage":
             st.session_state.legs_to_play = selected_legs
 
         # --- Player Selection / Add Player ---
-        if new_player_name_from_input:
-    if current_username_hp and current_username_hp in users:
-        player_stats_dict_add = users[current_username_hp].setdefault("player_stats", {})
-        if new_player_name_from_input not in player_stats_dict_add:
-            player_stats_dict_add[new_player_name_from_input] = {
-                "games_played": 0,
-                "games_won": 0,
-                "legs_won": 0,
-                "sets_won": 0,
-                "total_score": 0,
-                "highest_score": 0,
-                "total_turns": 0,
-                "num_busts": 0,
-                "darts_thrown": 0,
-                "preferred_doubles": [],
-                # ✅ Avatar hinzufügen
-                "avatar_url": f"https://api.dicebear.com/7.x/avataaars/png?seed={new_player_name_from_input}"
-            }
         st.markdown("---")
         st.subheader("Players")
         available_players = []
@@ -424,6 +406,7 @@ if st.session_state.current_page == "Homepage":
         with st.expander("Add / Manage Players"):
             st.write("Add new players (including yourself) to track stats & set preferences.")
             new_player_name_from_input = st.text_input("New Player Name", key="new_player_name_input").strip()
+
             if st.button("➕ Add Player"):
                 if new_player_name_from_input:
                     if current_username_hp and current_username_hp in users:
@@ -440,7 +423,8 @@ if st.session_state.current_page == "Homepage":
                                 "num_busts": 0,
                                 "darts_thrown": 0,
                                 "preferred_doubles": [],
-                                "avatar": "🎯"  # Default Emoji
+                                # ✅ Avatar direkt mit abspeichern
+                                "avatar_url": f"https://api.dicebear.com/7.x/avataaars/png?seed={new_player_name_from_input}"
                             }
                             save_users(users)
                             st.success(f"Player '{new_player_name_from_input}' added.")
@@ -451,7 +435,7 @@ if st.session_state.current_page == "Homepage":
                         st.error("Error saving player.")
                 else:
                     st.warning("Please enter a name.")
-            st.caption("Edit preferences or delete players in '⚙️ Settings'.")
+                    st.caption("Edit preferences or delete players in '⚙️ Settings'.")
 
         st.markdown("---")
 
