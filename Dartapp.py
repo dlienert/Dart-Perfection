@@ -244,13 +244,13 @@ if not st.session_state.logged_in:
                 elif new_username in users:
                     st.warning(t("user_exists"))
                 else:
-            hashed_pw = hash_password(new_password)
-            users[new_username] = {
-                "password": hashed_pw,
-                "avatar_choice": selected_avatar,  # ✅ Save avatar choice
-                "player_stats": {},
-                "games": [],
-                "checkout_log": []
+                hashed_pw = hash_password(new_password)
+                users[new_username] = {
+                    "password": hashed_pw,
+                    "avatar_choice": selected_avatar,  # ✅ Save avatar choice
+                    "player_stats": {},
+                    "games": [],
+                    "checkout_log": []
             }
             save_users(users)
             st.success("Registration successful! Please log in.")
