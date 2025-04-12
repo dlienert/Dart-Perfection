@@ -163,41 +163,41 @@
         "password": "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5",
         "player_stats": {
             "Neel": {
-                "games_played": 3,
-                "games_won": 1,
+                "games_played": 4,
+                "games_won": 2,
                 "legs_won": 0,
-                "sets_won": 1,
-                "total_score": 749,
+                "sets_won": 2,
+                "total_score": 850,
                 "highest_score": 118,
-                "total_turns": 38,
+                "total_turns": 40,
                 "num_busts": 14,
-                "darts_thrown": 112,
+                "darts_thrown": 118,
                 "preferred_doubles": [],
                 "avatar": "\ud83c\udfaf"
             },
             "Tobi": {
-                "games_played": 2,
-                "games_won": 2,
+                "games_played": 4,
+                "games_won": 3,
                 "legs_won": 0,
-                "sets_won": 2,
-                "total_score": 602,
+                "sets_won": 3,
+                "total_score": 794,
                 "highest_score": 75,
-                "total_turns": 14,
+                "total_turns": 19,
                 "num_busts": 2,
-                "darts_thrown": 40,
+                "darts_thrown": 53,
                 "preferred_doubles": [],
                 "avatar": "\ud83c\udfaf"
             },
             "Tobias": {
-                "games_played": 1,
+                "games_played": 2,
                 "games_won": 0,
                 "legs_won": 0,
                 "sets_won": 0,
-                "total_score": 84,
+                "total_score": 166,
                 "highest_score": 50,
-                "total_turns": 2,
+                "total_turns": 4,
                 "num_busts": 0,
-                "darts_thrown": 6,
+                "darts_thrown": 12,
                 "preferred_doubles": [],
                 "avatar": "\ud83c\udfaf"
             }
@@ -520,6 +520,38 @@
                 "last_dart_was_double": true,
                 "last_dart_str": "D2",
                 "game_mode": 501,
+                "leg": 1,
+                "set": 1
+            },
+            {
+                "timestamp": "2025-04-12 13:54:21",
+                "player": "Neel",
+                "score_before": 55,
+                "shots": [
+                    "15",
+                    "25",
+                    "15"
+                ],
+                "calculated_score": 55,
+                "result": "WIN",
+                "last_dart_was_double": false,
+                "last_dart_str": "15",
+                "game_mode": 101,
+                "leg": 1,
+                "set": 1
+            },
+            {
+                "timestamp": "2025-04-12 13:55:37",
+                "player": "Tobi",
+                "score_before": 14,
+                "shots": [
+                    "14"
+                ],
+                "calculated_score": 14,
+                "result": "WIN",
+                "last_dart_was_double": false,
+                "last_dart_str": "14",
+                "game_mode": 101,
                 "leg": 1,
                 "set": 1
             }
