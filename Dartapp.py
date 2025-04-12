@@ -658,9 +658,9 @@ elif st.session_state.current_page == "⚙️ Settings":
         )
         if selected_lang != st.session_state.get("language"):
             st.session_state.language = selected_lang
-            st.success("✅ Language updated!")  # ✅ Hier Info-Message
+            st.success("✅ Language updated!")  #  Hier Info-Message
             time.sleep(0.5)  # Optional für Benutzerfeedback, kleine Pause
-            st.experimental_rerun()  # ✅ Und sofort neu laden
+            st.experimental_rerun()  # Und sofort neu laden
 
     st.markdown(f"{t('selected_language')} **{selected_lang.upper()}**")
     with st.expander("🧩 Change Account Avatar"):
