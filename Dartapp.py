@@ -494,60 +494,83 @@ elif st.session_state.current_page == "Statistics":
                 try:
                     df = pd.DataFrame(table_data)
                     df_sorted = df.sort_values(by="Player").set_index("Player")
-                    # Display existing data table (already in your code)
                     st.dataframe(df_sorted, use_container_width=True)
 
-                    # ✅ New: Add visualizations section
-                    st.markdown("---")  # Add a horizontal line for visual separation
-                    st.subheader("Visualizations (Charts)")  # Section title
+                    # --- Visualizations ---
+                    st.markdown("---")
+                    st.subheader("📊 Visualizations (Charts)")
 
-                    # Check if there is player statistics data to visualize
                     if not player_stats_data:
-                        st.info("No player stats recorded yet.")  # Safe check
+                        st.info("No player stats recorded yet.")
                     else:
-                        # Convert the player_stats_data dictionary into a DataFrame
-                        df = pd.DataFrame.from_dict(player_stats_data, orient='index')
-                        df = df.fillna(0)  # Fill any missing values with zeros to avoid errors
+                        df = pd.DataFrame.from_dict(player_stats_data, orient='index').fillna(0)
 
-                        # 🎨 1. Games Played Chart
-                        st.markdown("### Games Played")
+                        # Calculate win rate safely
+                        df['win_rate'] = df.apply(lambda row: (row['games_won'] / row['games_played']) if row['games_played'] > 0 else 0, axis=1)
+                        df['avg_score_per_turn'] = df.apply(lambda row: (row['total_score'] / row['total_turns']) if row['total_turns'] > 0 else 0, axis=1)
+
+                        # Prepare all charts 
                         fig1, ax1 = plt.subplots()
                         ax1.bar(df.index, df['games_played'], color='skyblue')
-                        ax1.set_ylabel('Games Played')
-                        ax1.set_xlabel('Player')
-                        ax1.set_title('Total Games Played')
-                        st.pyplot(fig1)
+                        ax1.set_title("🎯 Games Played")
+                        ax1.set_ylabel("Games")
+                        ax1.set_xlabel("Player")
+                        plt.xticks(rotation=45)
+                        plt.tight_layout()
 
-                        # 🎨 2. Win Rate (%) Chart
-                        st.markdown("### Win Rate (%)")
-                        # Calculate win rate manually to avoid division by zero
-                        df['win_rate'] = df.apply(lambda row: (row['games_won'] / row['games_played'] * 100) if row['games_played'] > 0 else 0, axis=1)
+                        #Win rate chart
                         fig2, ax2 = plt.subplots()
-                        ax2.bar(df.index, df['win_rate'], color='lightgreen')
-                        ax2.set_ylabel('Win Rate (%)')
-                        ax2.set_xlabel('Player')
-                        ax2.set_title('Win Rate')
-                        st.pyplot(fig2)
+                        df.plot(kind='bar', y='win_rate', ax=ax2, color='lightgreen', legend=False)
+                        ax2.set_title("🏆 Win Rate (%)")
+                        ax2.set_xlabel("Player")
+                        ax2.set_ylabel("Win Rate (%)")
+                        ax2.set_ylim(0, 1)
+                        ax2.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: '{:.0%}'.format(y)))
+                        plt.xticks(rotation=45)
+                        plt.tight_layout()
 
-                        # 🎨 3. Average Score per Turn Chart
-                        st.markdown("### Average Score per Turn")
-                        # Calculate average score per turn safely
-                        df['avg_score_turn'] = df.apply(lambda row: (row['total_score'] / row['total_turns']) if row['total_turns'] > 0 else 0, axis=1)
+                        #average score per turn chart
                         fig3, ax3 = plt.subplots()
-                        ax3.bar(df.index, df['avg_score_turn'], color='salmon')
-                        ax3.set_ylabel('Avg Score per Turn')
-                        ax3.set_xlabel('Player')
-                        ax3.set_title('Average Score per Turn')
-                        st.pyplot(fig3)
+                        df.plot(kind='bar', y='avg_score_per_turn', ax=ax3, color='orange', legend=False)
+                        ax3.set_title("🎯 Avg Score per Turn")
+                        ax3.set_xlabel("Player")
+                        ax3.set_ylabel("Avg Score")
+                        plt.xticks(rotation=45)
+                        plt.tight_layout()
 
-                        # 🎨 4. Highest Score (Turn) Chart
-                        st.markdown("### Highest Score (Turn)")
+                        #highest score chart
                         fig4, ax4 = plt.subplots()
-                        ax4.bar(df.index, df['highest_score'], color='orange')
-                        ax4.set_ylabel('Highest Score')
-                        ax4.set_xlabel('Player')
-                        ax4.set_title("Highest Score in a Turn")
-                        st.pyplot(fig4)
+                        df.plot(kind='bar', y='highest_score', ax=ax4, color='salmon', legend=False)
+                        ax4.set_title("💥 Highest Score (Turn)")
+                        ax4.set_xlabel("Player")
+                        ax4.set_ylabel("Score")
+                        plt.xticks(rotation=45)
+                        plt.tight_layout()
+
+                        #total amount of darts thrown chart
+                        fig5, ax5 = plt.subplots()
+                        df.plot(kind='bar', y='darts_thrown', ax=ax5, color='purple', legend=False)
+                        ax5.set_title("🎯 Total Darts Thrown")
+                        ax5.set_xlabel("Player")
+                        ax5.set_ylabel("Darts")
+                        plt.xticks(rotation=45)
+                        plt.tight_layout()
+
+                        # Grid layout for charts
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.pyplot(fig1)
+                        with col2:
+                            st.pyplot(fig2)
+
+                        col3, col4 = st.columns(2)
+                        with col3:
+                            st.pyplot(fig3)
+                        with col4:
+                            st.pyplot(fig4)
+
+                        st.pyplot(fig5)  
+                        
                 except Exception as e:
                     st.error(f"{t('error_displaying_table')}: {e}")
             else:
