@@ -222,7 +222,7 @@ if not st.session_state.logged_in:
 
             avatar_options = []
             for style, seed in zip(avatar_styles, avatar_seeds):
-                avatar_url = f"https://avatars.dicebear.com/api/{style}/{seed}.svg"
+                avatar_url = f"https://avatars.dicebear.com/8.x/{style}/{seed}.svg"
                 avatar_options.append((f"{style}_{seed}", avatar_url))
 
             # Display avatars in a horizontal row
@@ -262,7 +262,7 @@ st.sidebar.markdown(f"👋 **{st.session_state.username}**!")
 current_user_data = users.get(st.session_state.username, {})
 avatar_choice = current_user_data.get("avatar_choice", "avataaars_hero1")
 avatar_style, avatar_seed = avatar_choice.split("_")
-avatar_url = f"https://avatars.dicebear.com/api/{avatar_style}/{avatar_seed}.svg"
+avatar_url = f"https://api.dicebear.com/8.x/avataaars/svg?seed={avatar_seed}"
 st.sidebar.image(avatar_url, width=80)
 st.sidebar.markdown("---")
 page_options = [t("homepage"), t("statistics"), t("game"), t("settings")]
@@ -1226,7 +1226,7 @@ elif st.session_state.current_page == "Game":
                 player_data = users.get(st.session_state.username, {}).get("player_stats", {}).get(player, {})
                 avatar_choice = users.get(st.session_state.username, {}).get("avatar_choice", "avataaars_hero1")
                 avatar_style, avatar_seed = avatar_choice.split("_")
-                avatar_url = f"https://avatars.dicebear.com/api/{avatar_style}/{avatar_seed}.svg"
+                avatar_url = f"https://avatars.dicebear.com/8.x/{avatar_style}/{avatar_seed}.svg"
                 st.image(avatar_url, width=60, caption=player)
                 is_current_player = (i == st.session_state.current_player_index)
                 border_style = "border: 3px solid #FF4B4B; padding: 5px 8px; border-radius: 5px; background-color: #FFF0F0;" if is_current_player else "border: 1px solid #ccc; padding: 5px 8px; border-radius: 5px;"
