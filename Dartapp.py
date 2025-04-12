@@ -644,7 +644,7 @@ elif st.session_state.current_page == "Statistics":
         st.warning(t("could_not_load_stats"))
 
 # --- Settings Page Logic ---
-elif st.session_state.current_page == "⚙️ Settings":
+elif st.session_state.current_page in ["⚙️ Settings", "Settings"]:
     st.title("⚙️ Settings & Player Management")
     st.write(f"Manage players and preferences for account: **{st.session_state.username}**")
     st.markdown("---")
