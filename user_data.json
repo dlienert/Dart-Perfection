@@ -163,15 +163,15 @@
         "password": "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5",
         "player_stats": {
             "Neel": {
-                "games_played": 6,
-                "games_won": 4,
+                "games_played": 7,
+                "games_won": 5,
                 "legs_won": 0,
-                "sets_won": 4,
-                "total_score": 1052,
+                "sets_won": 5,
+                "total_score": 1153,
                 "highest_score": 118,
-                "total_turns": 46,
+                "total_turns": 48,
                 "num_busts": 16,
-                "darts_thrown": 136,
+                "darts_thrown": 140,
                 "preferred_doubles": [],
                 "avatar": "\ud83c\udfaf"
             },
@@ -189,15 +189,15 @@
                 "avatar": "\ud83c\udfaf"
             },
             "Tobias": {
-                "games_played": 3,
+                "games_played": 4,
                 "games_won": 1,
                 "legs_won": 0,
                 "sets_won": 1,
-                "total_score": 267,
-                "highest_score": 57,
-                "total_turns": 7,
+                "total_score": 345,
+                "highest_score": 78,
+                "total_turns": 8,
                 "num_busts": 0,
-                "darts_thrown": 19,
+                "darts_thrown": 22,
                 "preferred_doubles": [],
                 "avatar": "\ud83c\udfaf"
             }
@@ -634,6 +634,21 @@
                 "result": "WIN",
                 "last_dart_was_double": true,
                 "last_dart_str": "D1",
+                "game_mode": 101,
+                "leg": 1,
+                "set": 1
+            },
+            {
+                "timestamp": "2025-04-12 15:41:56",
+                "player": "Neel",
+                "score_before": 45,
+                "shots": [
+                    "T15"
+                ],
+                "calculated_score": 45,
+                "result": "WIN",
+                "last_dart_was_double": false,
+                "last_dart_str": "T15",
                 "game_mode": 101,
                 "leg": 1,
                 "set": 1

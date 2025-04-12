@@ -656,9 +656,40 @@ elif st.session_state.current_page == "⚙️ Settings":
             index=["en", "de"].index(st.session_state.get("language", "en")),
             format_func=lambda x: "English" if x == "en" else "Deutsch",
         )
-        st.session_state.language = selected_lang
-        st.markdown(f"{t('selected_language')} **{selected_lang.upper()}**")
+        if selected_lang != st.session_state.get("language"):
+            st.session_state.language = selected_lang
+            st.success("✅ Language updated!")  # ✅ Hier Info-Message
+            time.sleep(0.5)  # Optional für Benutzerfeedback, kleine Pause
+            st.experimental_rerun()  # ✅ Und sofort neu laden
 
+    st.markdown(f"{t('selected_language')} **{selected_lang.upper()}**")
+    with st.expander("🧩 Change Account Avatar"):
+        st.markdown("### Select your new account avatar")
+
+        avatar_styles = ["avataaars", "bottts", "croodles", "identicon", "pixel-art"]
+        avatar_seeds = ["hero1", "champion2", "legend3", "dartmaster", "bullseye"]
+
+        avatar_options = []
+        for style, seed in zip(avatar_styles, avatar_seeds):
+            avatar_url = f"https://api.dicebear.com/8.x/{style}/svg?seed={seed}"
+            avatar_options.append((f"{style}_{seed}", avatar_url))
+
+        selected_avatar = st.radio(
+            "Choose your new avatar:",
+            options=[option[0] for option in avatar_options],
+            format_func=lambda x: x.split("_")[1].capitalize(),
+            horizontal=True,
+        )
+
+        selected_avatar_url = [url for name, url in avatar_options if name == selected_avatar][0]
+        st.image(selected_avatar_url, width=120, caption="Preview")
+
+        if st.button("Save Avatar Choice", key="save_account_avatar"):
+            users[st.session_state.username]["avatar_choice"] = selected_avatar
+            save_users(users)
+            st.success("✅ Avatar updated successfully!")
+            time.sleep(1)
+            st.rerun()
 
     current_username = st.session_state.username
     # Ensure user exists and has player_stats key before proceeding
