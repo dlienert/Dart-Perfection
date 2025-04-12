@@ -214,12 +214,16 @@ if not st.session_state.logged_in:
                 # Check password safely using .get()
                 hashed_input_pw = hash_password(password)
                 if username in users and users[username].get("password") == hashed_input_pw:
-                    print(f"Login successful: {username}")
-                    print(f"Current page: {st.session_state.current_page}")
                     st.session_state.logged_in = True
                     st.session_state.username = username
-                    st.session_state.current_page = page_map.get("homepage", "Homepage")
+                    st.session_state.current_page = page_map.get("Homepage", "homepage")  # Achte auch hier auf Groß-/Kleinschreibung!
                     st.session_state.players_selected_for_game = []
+                    
+                    #  Debug help
+                    print(f"✅ Login successful: {st.session_state.username}")
+                    print(f"📄 Current Page after login: {st.session_state.current_page}")
+                    print(f"🗂️ Session State: {st.session_state}")
+
                     st.rerun()
                 else:
                     st.error(t("invalid_login"))
