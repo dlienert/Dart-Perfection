@@ -171,7 +171,7 @@ if "app_initialized" not in st.session_state:
     st.session_state.app_initialized = True
     st.session_state.logged_in = False
     st.session_state.username = ""
-    st.session_state.current_page = page_map.get("homepage")
+    st.session_state.current_page = page_map.get("Homepage", "homepage")
     st.session_state.game_mode = 501
     st.session_state.check_out_mode = "Double Out"
     st.session_state.sets_to_play = 1
@@ -202,7 +202,7 @@ if "app_initialized" not in st.session_state:
 
 # --- Login / Register Page ---
 if not st.session_state.logged_in:
-    st.session_state.current_page = page_map.get("homepage")
+    st.session_state.current_page = page_map.get("Homepage", "homepage")
     st.title(f"🔐 {t('welcome')}")
     login_tab, register_tab = st.tabs([t("login"), t("register")])
     with login_tab:
@@ -291,7 +291,7 @@ try:
     current_page_index = list(page_map.keys()).index(st.session_state.current_page)
 except ValueError:
     current_page_index = 0
-    st.session_state.current_page = page_map.get("homepage")
+    st.session_state.current_page = page_map.get("Homepage", "homepage")
 
 # deactivate navigation during the game
 nav_disabled = st.session_state.current_page == "Game" and not st.session_state.game_over
@@ -335,7 +335,7 @@ elif chosen_page == "Game" and st.session_state.current_page != "Game":
 if st.session_state.current_page == "Game" and not st.session_state.game_over:
     st.sidebar.warning("🎯 Game in progress!")
     if st.sidebar.button("⚠️ Quit Current Game"):
-        st.session_state.current_page = page_map.get("homepage")
+        st.session_state.current_page = page_map.get("Homepage", "homepage")
         st.session_state.game_over = True
         st.session_state.current_turn_shots = []
         st.session_state.pending_modifier = None
@@ -1258,7 +1258,7 @@ elif st.session_state.current_page == "game":
                 total_score = sum(t[0] for t in st.session_state.player_turn_history.get(player, []) if len(t) > 2 and t[2] != "BUST")
                 st.markdown(f"Total Score: {total_score}")
         if st.button("Play Again / New Game Setup", use_container_width=True):
-            st.session_state.current_page = page_map.get("homepage")
+            st.session_state.current_page = page_map.get("Homepage", "homepage")
             st.session_state.players_selected_for_game = []
             st.rerun()
         st.stop()
@@ -1266,7 +1266,7 @@ elif st.session_state.current_page == "game":
     if not st.session_state.players_selected_for_game:
          st.error("No players selected.")
          if st.button("🏠 Back to Homepage", use_container_width=True):
-             st.session_state.current_page = page_map.get("homepage")
+             st.session_state.current_page = page_map.get("Homepage", "homepage")
              st.rerun()
          st.stop()
 
@@ -1544,6 +1544,6 @@ elif st.session_state.current_page == "game":
 # --- Fallback for Unknown Page State ---
 elif st.session_state.logged_in:
      st.warning(t('invalid_page_state'))
-     st.session_state.current_page = page_map.get("homepage")
+     st.session_state.current_page = page_map.get("Homepage", "homepage")
      time.sleep(1)
      st.rerun()
