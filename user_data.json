@@ -163,28 +163,28 @@
         "password": "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5",
         "player_stats": {
             "Neel": {
-                "games_played": 2,
+                "games_played": 3,
                 "games_won": 1,
                 "legs_won": 0,
                 "sets_won": 1,
-                "total_score": 257,
+                "total_score": 749,
                 "highest_score": 118,
-                "total_turns": 28,
-                "num_busts": 12,
-                "darts_thrown": 82,
+                "total_turns": 38,
+                "num_busts": 14,
+                "darts_thrown": 112,
                 "preferred_doubles": [],
                 "avatar": "\ud83c\udfaf"
             },
             "Tobi": {
-                "games_played": 1,
-                "games_won": 1,
+                "games_played": 2,
+                "games_won": 2,
                 "legs_won": 0,
-                "sets_won": 1,
-                "total_score": 101,
-                "highest_score": 38,
-                "total_turns": 3,
-                "num_busts": 0,
-                "darts_thrown": 8,
+                "sets_won": 2,
+                "total_score": 602,
+                "highest_score": 75,
+                "total_turns": 14,
+                "num_busts": 2,
+                "darts_thrown": 40,
                 "preferred_doubles": [],
                 "avatar": "\ud83c\udfaf"
             },
@@ -436,6 +436,90 @@
                 "last_dart_was_double": false,
                 "last_dart_str": "16",
                 "game_mode": 101,
+                "leg": 1,
+                "set": 1
+            },
+            {
+                "timestamp": "2025-04-12 11:57:02",
+                "player": "Neel",
+                "score_before": 30,
+                "shots": [
+                    "20",
+                    "10",
+                    "1"
+                ],
+                "calculated_score": 31,
+                "result": "BUST",
+                "last_dart_was_double": null,
+                "last_dart_str": "1",
+                "game_mode": 501,
+                "leg": 1,
+                "set": 1
+            },
+            {
+                "timestamp": "2025-04-12 11:57:10",
+                "player": "Tobi",
+                "score_before": 8,
+                "shots": [
+                    "2",
+                    "3",
+                    "3"
+                ],
+                "calculated_score": 8,
+                "result": "BUST (Invalid Checkout)",
+                "last_dart_was_double": null,
+                "last_dart_str": "3",
+                "game_mode": 501,
+                "leg": 1,
+                "set": 1
+            },
+            {
+                "timestamp": "2025-04-12 11:57:27",
+                "player": "Tobi",
+                "score_before": 8,
+                "shots": [
+                    "2",
+                    "3",
+                    "2"
+                ],
+                "calculated_score": 7,
+                "result": "BUST",
+                "last_dart_was_double": null,
+                "last_dart_str": "2",
+                "game_mode": 501,
+                "leg": 1,
+                "set": 1
+            },
+            {
+                "timestamp": "2025-04-12 11:57:32",
+                "player": "Neel",
+                "score_before": 30,
+                "shots": [
+                    "7",
+                    "7",
+                    "16"
+                ],
+                "calculated_score": 30,
+                "result": "BUST (Invalid Checkout)",
+                "last_dart_was_double": null,
+                "last_dart_str": "16",
+                "game_mode": 501,
+                "leg": 1,
+                "set": 1
+            },
+            {
+                "timestamp": "2025-04-12 11:57:54",
+                "player": "Tobi",
+                "score_before": 8,
+                "shots": [
+                    "4",
+                    "D2"
+                ],
+                "calculated_score": 8,
+                "result": "WIN",
+                "last_dart_was_double": true,
+                "last_dart_str": "D2",
+                "game_mode": 501,
                 "leg": 1,
                 "set": 1
             }
