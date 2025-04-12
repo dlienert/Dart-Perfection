@@ -546,7 +546,7 @@ elif st.session_state.current_page == "Statistics":
                         ax4.bar(df.index, df['highest_score'], color='orange')
                         ax4.set_ylabel('Highest Score')
                         ax4.set_xlabel('Player')
-                        ax4.set_title('Highest Score in a Turn")
+                        ax4.set_title("Highest Score in a Turn")
                         st.pyplot(fig4)
                 except Exception as e:
                     st.error(f"{t('error_displaying_table')}: {e}")
