@@ -43,8 +43,7 @@ translations = {
     "players_selected": {"de": "Spieler ausgewählt", "en": "Players selected"},
     "start_game_button": {"de": "🎯 Spiel starten", "en": "🎯 Start Game"},
     "configure_game": {"de": "Spiel konfigurieren,", "en": "Configure game,"},
-
-    # Game Page
+ # Game Page
     "game_on": {"de": "Spiel läuft", "en": "Game On"},
     "set": {"de": "Satz", "en": "Set"},
     "leg": {"de": "Leg"},
@@ -91,11 +90,22 @@ translations = {
     "language_settings": {"de": "🌐 Spracheinstellungen", "en": "🌐 Language Settings"},
 }
 
+
+   
 # Define helper function to fetch translation based on session state
 def t(key):
     """Returns the translation for a given key based on selected language."""
     lang = st.session_state.get("language", "en")  # Default to English
     return translations.get(key, {}).get(lang, key)  # Fallback to key if missing
+
+#page mapping for stable navigation
+page_map = {
+    "Homepage": "homepage",
+    "Statistics": "statistics",
+    "Game": "game",
+    "Settings": "settings",
+}
+reverse_page_map = {v: k for k, v in page_map.items()}
 
 # --- Configuration ---
 USER_DATA_FILE = "user_data.json"
@@ -160,7 +170,7 @@ if "app_initialized" not in st.session_state:
     st.session_state.app_initialized = True
     st.session_state.logged_in = False
     st.session_state.username = ""
-    st.session_state.current_page = "Login"
+    st.session_state.current_page = page_map.get("homepage")
     st.session_state.game_mode = 501
     st.session_state.check_out_mode = "Double Out"
     st.session_state.sets_to_play = 1
@@ -191,7 +201,7 @@ if "app_initialized" not in st.session_state:
 
 # --- Login / Register Page ---
 if not st.session_state.logged_in:
-    st.session_state.current_page = "Login"
+    st.session_state.current_page = page_map.get("homepage")
     st.title(f"🔐 {t('welcome')}")
     login_tab, register_tab = st.tabs([t("login"), t("register")])
     with login_tab:
@@ -205,7 +215,7 @@ if not st.session_state.logged_in:
                 if username in users and users[username].get("password") == hashed_input_pw:
                     st.session_state.logged_in = True
                     st.session_state.username = username
-                    st.session_state.current_page = "Homepage"
+                    st.session_state.current_page = page_map.get("homepage", "Homepage")
                     st.session_state.players_selected_for_game = []
                     st.rerun()
                 else:
@@ -257,7 +267,7 @@ if not st.session_state.logged_in:
     st.stop()
 
 # --- Main App Area ---
-# --- Sidebar ---
+# Sidebar User Info
 st.sidebar.markdown(f"👋 **{st.session_state.username}**!")
 current_user_data = users.get(st.session_state.username, {})
 avatar_choice = current_user_data.get("avatar_choice", "avataaars_hero1")
@@ -265,15 +275,21 @@ avatar_style, avatar_seed = avatar_choice.split("_")
 avatar_url = f"https://api.dicebear.com/8.x/avataaars/svg?seed={avatar_seed}"
 st.sidebar.image(avatar_url, width=80)
 st.sidebar.markdown("---")
-page_options = [t("homepage"), t("statistics"), t("game"), t("settings")]
-can_navigate_to_game = st.session_state.current_page == "Game" and not st.session_state.game_over
+
+# Page options 
+page_options = list(page_map.values())
+
+# get the current index
 try:
-    current_page_index = page_options.index(st.session_state.current_page)
+    current_page_index = list(page_map.keys()).index(st.session_state.current_page)
 except ValueError:
     current_page_index = 0
-    st.session_state.current_page = "Homepage"
-# Disable radio navigation while game is active and not over
+    st.session_state.current_page = page_map.get("homepage")
+
+# deactivate navigation during the game
 nav_disabled = st.session_state.current_page == "Game" and not st.session_state.game_over
+
+# Sidebar Navigation with Mapping
 chosen_page = st.sidebar.radio(
     t("navigation"),
     page_options,
@@ -282,6 +298,8 @@ chosen_page = st.sidebar.radio(
     disabled=nav_disabled
 )
 
+# translation in internal page ID
+st.session_state.current_page = reverse_page_map.get(chosen_page, "homepage")
 # Handle navigation selection
 if chosen_page != st.session_state.current_page:
     # Allow navigation away only if not in an active game
@@ -302,7 +320,7 @@ elif chosen_page == "Game" and st.session_state.current_page != "Game":
 if st.session_state.current_page == "Game" and not st.session_state.game_over:
     st.sidebar.warning("🎯 Game in progress!")
     if st.sidebar.button("⚠️ Quit Current Game"):
-        st.session_state.current_page = "Homepage"
+        st.session_state.current_page = page_map.get("homepage")
         st.session_state.game_over = True
         st.session_state.current_turn_shots = []
         st.session_state.pending_modifier = None
@@ -319,7 +337,7 @@ if st.sidebar.button(t("logout")):
 # --- Page Content Area ---
 
 # --- Homepage Tab Logic ---
-if st.session_state.current_page == "Homepage":
+if st.session_state.current_page == "homepage":
     st.title(f"🎯 {t('homepage')}")
     st.markdown(f"{t('configure_game')} **{st.session_state.username}**!")
     
@@ -475,7 +493,7 @@ if st.session_state.current_page == "Homepage":
         st.info("🏏 Planned.")
 
 # --- Statistics Tab Logic ---
-elif st.session_state.current_page == "Statistics":
+elif st.session_state.current_page == "statistics":
     st.title(f"📊 {t('personal_statistics')}")
     st.write(f"{t('stats_for_account')}: **{st.session_state.username}**")
 
@@ -493,7 +511,7 @@ elif st.session_state.current_page == "Statistics":
     # Refresh button to get a new quote
     if st.button("🔄 Get New Quote"):
         st.session_state.motivational_quote = get_motivational_quote()
-        st.experimental_rerun()  # Refresh the page to show the new quote
+        st.rerun()  # Refresh the page to show the new quote
 
     if "confirm_delete_player" not in st.session_state:
         st.session_state.confirm_delete_player = None
@@ -644,7 +662,7 @@ elif st.session_state.current_page == "Statistics":
         st.warning(t("could_not_load_stats"))
 
 # --- Settings Page Logic ---
-elif st.session_state.current_page in ["⚙️ Settings", "Settings"]:
+elif st.session_state.current_page == "settings":
     st.title("⚙️ Settings & Player Management")
     st.write(f"Manage players and preferences for account: **{st.session_state.username}**")
     st.markdown("---")
@@ -660,7 +678,7 @@ elif st.session_state.current_page in ["⚙️ Settings", "Settings"]:
             st.session_state.language = selected_lang
             st.success("✅ Language updated!")  #  Hier Info-Message
             time.sleep(0.5)  # Optional für Benutzerfeedback, kleine Pause
-            st.experimental_rerun()  # Und sofort neu laden
+            st.rerun()  # Und sofort neu laden
 
     st.markdown(f"{t('selected_language')} **{selected_lang.upper()}**")
     with st.expander("🧩 Change Account Avatar"):
@@ -848,7 +866,7 @@ elif st.session_state.current_page in ["⚙️ Settings", "Settings"]:
 
 
 # --- Game Tab Logic ---
-elif st.session_state.current_page == "Game":
+elif st.session_state.current_page == "game":
 
     # --- Helper Functions (Fully Expanded) ---
     def parse_score_input(score_str):
@@ -1225,7 +1243,7 @@ elif st.session_state.current_page == "Game":
                 total_score = sum(t[0] for t in st.session_state.player_turn_history.get(player, []) if len(t) > 2 and t[2] != "BUST")
                 st.markdown(f"Total Score: {total_score}")
         if st.button("Play Again / New Game Setup", use_container_width=True):
-            st.session_state.current_page = "Homepage"
+            st.session_state.current_page = page_map.get("homepage")
             st.session_state.players_selected_for_game = []
             st.rerun()
         st.stop()
@@ -1233,7 +1251,7 @@ elif st.session_state.current_page == "Game":
     if not st.session_state.players_selected_for_game:
          st.error("No players selected.")
          if st.button("🏠 Back to Homepage", use_container_width=True):
-             st.session_state.current_page = "Homepage"
+             st.session_state.current_page = page_map.get("homepage")
              st.rerun()
          st.stop()
 
@@ -1511,6 +1529,6 @@ elif st.session_state.current_page == "Game":
 # --- Fallback for Unknown Page State ---
 elif st.session_state.logged_in:
      st.warning(t('invalid_page_state'))
-     st.session_state.current_page = "Homepage"
+     st.session_state.current_page = page_map.get("homepage")
      time.sleep(1)
      st.rerun()
