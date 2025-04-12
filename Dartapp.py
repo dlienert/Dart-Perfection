@@ -220,7 +220,7 @@ if not st.session_state.logged_in:
                     st.session_state.players_selected_for_game = []
                     
                     #  Debug help
-                    print(f"✅ Login successful: {st.session_state.username}")
+                    print(f" Login successful: {st.session_state.username}")
                     print(f"📄 Current Page after login: {st.session_state.current_page}")
                     print(f"🗂️ Session State: {st.session_state}")
 
@@ -296,7 +296,7 @@ except ValueError:
 # deactivate navigation during the game
 nav_disabled = st.session_state.current_page == "Game" and not st.session_state.game_over
 
-# Sidebar Navigation with Mapping
+# Navigation
 chosen_page = st.sidebar.radio(
     t("navigation"),
     page_options,
@@ -305,16 +305,21 @@ chosen_page = st.sidebar.radio(
     disabled=nav_disabled
 )
 
-print(f"Login successful: {username}")
-print(f"Current page: {st.session_state.current_page}")
+# Debug prints
+print("🪵 --- Debug Navigation ---")
+print(f"✅ Debug: Login successful: {st.session_state.username}")
+print(f"✅ Debug: Chosen Page (visible name): {chosen_page}")
+print(f"✅ Debug: Current internal page: {st.session_state.current_page}")
+print(f"✅ Debug: Navigation disabled: {nav_disabled}")
+print("🪵 -----------------------")
 
-# translation in internal page ID
-st.session_state.current_page = reverse_page_map.get(chosen_page, "homepage")
+# Transform into page ID
+internal_chosen_page = page_map.get(chosen_page, "homepage")
+
 # Handle navigation selection
-if chosen_page != st.session_state.current_page:
-    # Allow navigation away only if not in an active game
+if internal_chosen_page != st.session_state.current_page:
     if not nav_disabled:
-        st.session_state.current_page = chosen_page
+        st.session_state.current_page = internal_chosen_page
         st.rerun()
     else:
         # If disabled, reset the radio button visually if possible
