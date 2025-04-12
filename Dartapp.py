@@ -214,6 +214,29 @@ if not st.session_state.logged_in:
          with st.form("register_form"):
             new_username = st.text_input(t("username"), key="reg_user").strip()
             new_password = st.text_input(t("password"), type="password", key="reg_pass")
+            # ✅ Avatar Selection from API
+            st.markdown("### Select Your Avatar")
+
+            avatar_styles = ["avataaars", "bottts", "croodles", "identicon", "pixel-art"]
+            avatar_seeds = ["hero1", "champion2", "legend3", "dartmaster", "bullseye"]
+
+            avatar_options = []
+            for style, seed in zip(avatar_styles, avatar_seeds):
+                avatar_url = f"https://avatars.dicebear.com/api/{style}/{seed}.svg"
+                avatar_options.append((f"{style}_{seed}", avatar_url))
+
+            # Display avatars in a horizontal row
+            selected_avatar = st.radio(
+                "Choose your Avatar:",
+                options=[option[0] for option in avatar_options],
+                format_func=lambda x: x.split("_")[1].capitalize(),
+                horizontal=True,
+            )
+
+            # Show the selected avatar image larger
+            selected_avatar_url = [url for name, url in avatar_options if name == selected_avatar][0]
+            st.image(selected_avatar_url, width=120, caption="Your selected Avatar")
+
             reg_button = st.form_submit_button(t("register"), use_container_width=True)
             if reg_button:
                 if not new_username or not new_password:
@@ -221,22 +244,26 @@ if not st.session_state.logged_in:
                 elif new_username in users:
                     st.warning(t("user_exists"))
                 else:
-                    hashed_pw = hash_password(new_password)
-                    # Initialize new user entry correctly
-                    users[new_username] = {
-                        "password": hashed_pw,
-                        "player_stats": {},
-                        "games": [],
-                        "checkout_log": []
-                        # No top-level preferred_doubles here
-                    }
-                    save_users(users)
-                    st.success(t("registration_success"))
+            hashed_pw = hash_password(new_password)
+            users[new_username] = {
+                "password": hashed_pw,
+                "avatar_choice": selected_avatar,  # ✅ Save avatar choice
+                "player_stats": {},
+                "games": [],
+                "checkout_log": []
+            }
+            save_users(users)
+            st.success("Registration successful! Please log in.")
     st.stop()
 
 # --- Main App Area ---
 # --- Sidebar ---
 st.sidebar.markdown(f"👋 **{st.session_state.username}**!")
+current_user_data = users.get(st.session_state.username, {})
+avatar_choice = current_user_data.get("avatar_choice", "avataaars_hero1")
+avatar_style, avatar_seed = avatar_choice.split("_")
+avatar_url = f"https://avatars.dicebear.com/api/{avatar_style}/{avatar_seed}.svg"
+st.sidebar.image(avatar_url, width=80)
 st.sidebar.markdown("---")
 page_options = [t("homepage"), t("statistics"), t("game"), t("settings")]
 can_navigate_to_game = st.session_state.current_page == "Game" and not st.session_state.game_over
@@ -358,6 +385,24 @@ if st.session_state.current_page == "Homepage":
             st.session_state.legs_to_play = selected_legs
 
         # --- Player Selection / Add Player ---
+        if new_player_name_from_input:
+    if current_username_hp and current_username_hp in users:
+        player_stats_dict_add = users[current_username_hp].setdefault("player_stats", {})
+        if new_player_name_from_input not in player_stats_dict_add:
+            player_stats_dict_add[new_player_name_from_input] = {
+                "games_played": 0,
+                "games_won": 0,
+                "legs_won": 0,
+                "sets_won": 0,
+                "total_score": 0,
+                "highest_score": 0,
+                "total_turns": 0,
+                "num_busts": 0,
+                "darts_thrown": 0,
+                "preferred_doubles": [],
+                # ✅ Avatar hinzufügen
+                "avatar_url": f"https://api.dicebear.com/7.x/avataaars/png?seed={new_player_name_from_input}"
+            }
         st.markdown("---")
         st.subheader("Players")
         available_players = []
@@ -1145,6 +1190,25 @@ elif st.session_state.current_page == "Game":
         else:
             st.header("Match finished.")
         st.balloons()
+
+        st.markdown("---")
+        st.subheader("📸 Player Overview")
+
+        current_username_gameover = st.session_state.username
+        player_stats_gameover = users.get(current_username_gameover, {}).get("player_stats", {})
+
+        # Grid layout
+        cols = st.columns(len(st.session_state.players_selected_for_game))
+
+        for idx, player in enumerate(st.session_state.players_selected_for_game):
+            with cols[idx]:
+                avatar_url = player_stats_gameover.get(player, {}).get("avatar_url", f"https://api.dicebear.com/7.x/avataaars/png?seed={player}")
+                st.image(avatar_url, width=100)
+                st.markdown(f"**{player}**")
+                st.markdown(f"Sets Won: {st.session_state.player_sets_won.get(player, 0)}")
+                st.markdown(f"Legs Won: {st.session_state.player_legs_won.get(player, 0)}")
+                total_score = sum(t[0] for t in st.session_state.player_turn_history.get(player, []) if len(t) > 2 and t[2] != "BUST")
+                st.markdown(f"Total Score: {total_score}")
         if st.button("Play Again / New Game Setup", use_container_width=True):
             st.session_state.current_page = "Homepage"
             st.session_state.players_selected_for_game = []
@@ -1175,6 +1239,11 @@ elif st.session_state.current_page == "Game":
         num_players = len(st.session_state.players_selected_for_game)
         if num_players > 0:
             for i, player in enumerate(st.session_state.players_selected_for_game):
+                player_data = users.get(st.session_state.username, {}).get("player_stats", {}).get(player, {})
+                avatar_choice = users.get(st.session_state.username, {}).get("avatar_choice", "avataaars_hero1")
+                avatar_style, avatar_seed = avatar_choice.split("_")
+                avatar_url = f"https://avatars.dicebear.com/api/{avatar_style}/{avatar_seed}.svg"
+                st.image(avatar_url, width=60, caption=player)
                 is_current_player = (i == st.session_state.current_player_index)
                 border_style = "border: 3px solid #FF4B4B; padding: 5px 8px; border-radius: 5px; background-color: #FFF0F0;" if is_current_player else "border: 1px solid #ccc; padding: 5px 8px; border-radius: 5px;"
                 with st.container():
