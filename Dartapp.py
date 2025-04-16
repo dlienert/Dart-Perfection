@@ -36,193 +36,6 @@ def get_motivational_quote():
         ]
         return random.choice(fallbacks)
 
-# --- Language Translation Setup ---
-
-# Define translation dictionary for app text (Expanded with new/missing keys)
-translations = {
-    "welcome": {"de": "Willkommen bei Darts Counter", "en": "Welcome to Darts Counter"},
-    "login": {"de": "Anmelden", "en": "Login"},
-    "register": {"de": "Registrieren", "en": "Register"},
-    "username": {"de": "Benutzername", "en": "Username"},
-    "password": {"de": "Passwort", "en": "Password"},
-    "invalid_login": {"de": "Ungültiger Login oder Passwort.", "en": "Invalid username or password."},
-    "empty_credentials": {"de": "Bitte Benutzername und Passwort eingeben.", "en": "Please enter username and password."},
-    "user_exists": {"de": "Benutzername existiert bereits.", "en": "Username already exists."},
-    "start_game": {"de": "Spiel starten", "en": "Start Game"},
-    "logout": {"de": "Abmelden", "en": "Logout"},
-    "players": {"de": "Spieler", "en": "Players"},
-    "score": {"de": "Punktestand", "en": "Score"},
-    "statistics": {"de": "Statistiken", "en": "Statistics"},
-    "settings": {"de": "Einstellungen", "en": "Settings"},
-    "game": {"de": "Spiel", "en": "Game"},
-    "navigation": {"de": "Navigation", "en": "Navigation"},
-    "homepage": {"de": "Startseite", "en": "Homepage"},
-    "select_language": {"de": "Sprache wählen", "en": "Select Language"},
-    "selected_language": {"de": "Gewählte Sprache:", "en": "Selected Language:"},
-    "players_selected": {"de": "Spieler ausgewählt", "en": "Players selected"},
-    "start_game_button": {"de": "🎯 Spiel starten", "en": "🎯 Start Game"},
-    "configure_game": {"de": "Spiel konfigurieren,", "en": "Configure game,"},
-    "finish_quit_game": {"de": "Spiel beenden/verlassen um zu navigieren.", "en": "Finish/Quit game to navigate."},
-    "start_game_homepage": {"de": "Starte ein Spiel auf der Startseite.", "en": "Start a game from the Homepage."},
-
-    # Homepage - Game Setup
-    "x01_setup": {"de": "X01 Einstellungen", "en": "X01 Setup"},
-    "cricket_soon": {"de": "Cricket (bald)", "en": "Cricket (soon)"},
-    "x01_options": {"de": "X01 Optionen", "en": "X01 Options"},
-    "x01_mode": {"de": "X01 Modus", "en": "X01 Mode"}, # Changed label
-    "check_out_mode": {"de": "Checkout", "en": "Checkout"}, # Changed label
-    "sets_to_win": {"de": "Gewinnsätze", "en": "Sets to Win"}, # Changed label
-    "leg_set_rule": {"de": "Leg/Set Regel", "en": "Leg/Set Rule"}, # Changed label
-    "check_in_mode": {"de": "Checkin", "en": "Checkin"}, # Changed label
-    "legs_per_set": {"de": "Legs pro Satz", "en": "Legs per Set"}, # Changed label
-    "select_players_for_game": {"de": "Spieler für das Spiel auswählen (inkl. dich selbst, falls du mitspielst!)", "en": "Select players for game (incl. yourself if playing!)"},
-    "add_manage_players": {"de": "Spieler hinzufügen / verwalten", "en": "Add / Manage Players"},
-    "add_new_player_info": {"de": "Neue Spieler hinzufügen, um Statistiken zu verfolgen & Einstellungen festzulegen.", "en": "Add new players (including yourself) to track stats & set preferences."},
-    "new_player_name": {"de": "Neuer Spielername", "en": "New Player Name"},
-    "add_player_button": {"de": "➕ Spieler hinzufügen", "en": "➕ Add Player"},
-    "edit_delete_in_settings": {"de": "Präferenzen bearbeiten oder Spieler löschen in '⚙️ Einstellungen'.", "en": "Edit preferences or delete players in '⚙️ Settings'."},
-    "warning_select_players": {"de": "⚠️ Spieler auswählen.", "en": "⚠️ Select players."},
-    "warning_select_x01_mode": {"de": "⚠️ X01 Modus auswählen.", "en": "⚠️ Select X01 mode."},
-
-    # Game Page
-    "game_on": {"de": "Spiel läuft", "en": "Game On"},
-    "set": {"de": "Satz", "en": "Set"},
-    "leg": {"de": "Leg"},
-    "mode": {"de": "Modus", "en": "Mode"},
-    "rule": {"de": "Regel", "en": "Rule"},
-    "enter_score_for": {"de": "Punkte eingeben für:", "en": "Enter score for:"},
-    "dart": {"de": "Dart", "en": "Dart"},
-    "double": {"de": "Doppel", "en": "Double"},
-    "triple": {"de": "Triple", "en": "Triple"},
-    "back": {"de": "Zurück", "en": "Back"},
-    "undo": {"de": "Rückgängig", "en": "Undo"},
-    "miss": {"de": "Fehler", "en": "Miss"},
-    "remove_last": {"de": "Letzten entfernen", "en": "Remove last"},
-    "set_double": {"de": "Doppel setzen", "en": "Set Double"},
-    "set_triple": {"de": "Triple setzen", "en": "Set Triple"},
-    "undo_last_turn": {"de": "Letzten Wurf rückgängig", "en": "Undo last turn"},
-    "game_over_start_new": {"de": "Spiel vorbei. Neues Spiel starten.", "en": "Game over. Start new game."},
-    "invalid_page_state": {"de": "Ungültiger Seitenstatus.", "en": "Invalid page state."},
-    "game_in_progress": {"de": "🎯 Spiel läuft!", "en": "🎯 Game in progress!"},
-    "end_game_early": {"de": "⚠️ Spiel beenden", "en": "⚠️ End Game Early"}, # Changed label for quit button
-    "back_to_homepage": {"de": "🏠 Zurück zur Startseite", "en": "🏠 Back to Homepage"},
-    "no_players_in_game_warning": {"de": "Keine Spieler im Spiel ausgewählt.", "en": "No players selected for game."},
-    "input_indicator": {"de": "Eingabe:", "en": "Input:"},
-    "double_indicator": {"de": "[**DBL**]", "en": "[**DBL**]"},
-    "triple_indicator": {"de": "[**TPL**]", "en": "[**TPL**]"},
-    "scores_header": {"de": "Spielstände", "en": "Scores"},
-    "avg_short": {"de": "Avg", "en": "Avg"},
-    "legs_short": {"de": "Legs", "en": "Legs"},
-    "sets_short": {"de": "Sätze", "en": "Sets"},
-    "last_turn_short": {"de": "Letzte", "en": "Last"},
-    "out_suggestion": {"de": "🎯 **Out:**", "en": "🎯 **Out:**"},
-    "setup_suggestion": {"de": "🔧 **Setup:**", "en": "🔧 **Setup:**"},
-    "one_dart_suffix": {"de": "(1D)", "en": "(1D)"},
-    "two_dart_suffix": {"de": "(2D)", "en": "(2D)"},
-    "three_dart_suffix": {"de": "(3D)", "en": "(3D)"},
-    "no_checkout_bogie": {"de": "Kein Checkout", "en": "No checkout"},
-    "toast_use_d25": {"de": "Benutze D25", "en": "Use D25"},
-    "toast_invalid_modifier_T": {"de": "T nur 1-20", "en": "T only 1-20"},
-    "toast_invalid_modifier_D": {"de": "D nur 1-20, 25", "en": "D only 1-20, 25"},
-    "toast_bust": {"de": "❌ Bust! Punktestand bleibt", "en": "❌ Bust! Score remains"},
-    "toast_invalid_checkout": {"de": "❌ Ungültiger Checkout! Muss auf Doppel enden. Punktestand bleibt", "en": "❌ Invalid Checkout! Must finish on a Double. Score remains"},
-    "toast_game_shot_leg": {"de": "🎯 Game Shot!", "en": "🎯 Game Shot!"}, # Player name and leg will be added
-    "toast_wins_leg": {"de": "gewinnt Leg", "en": "wins Leg"}, # Player name and leg number will be added
-    "toast_player_busted": {"de": "Busted!", "en": "Busted!"}, # Player name added
-    "toast_player_invalid_checkout": {"de": "Ungültiger Checkout!", "en": "Invalid Checkout!"}, # Player name added
-    "toast_player_scored": {"de": "erzielte", "en": "scored"}, # Player name and score added
-    "toast_log_error": {"de": "Log Fehler:", "en": "Log Error:"},
-    "toast_undid_turn": {"de": "Zug rückgängig gemacht.", "en": "Undid turn."},
-    "toast_nothing_to_undo": {"de": "Nichts zum Rückgängigmachen.", "en": "Nothing to undo."},
-    "toast_prepare_next_set": {"de": "Bereite dich auf den nächsten Satz vor...", "en": "Prepare for next Set..."},
-    "toast_prepare_next_leg": {"de": "Bereite dich auf das nächste Leg vor...", "en": "Prepare for next Leg..."},
-    "toast_player_wins_set": {"de": "gewinnt Satz", "en": "wins Set"}, # Player name and set number will be added
-    "game_over_title": {"de": "🎉 Spiel vorbei!", "en": "🎉 Game Over!"},
-    "game_over_winner_header": {"de": "🏆 Gewinner:", "en": "🏆 Winner:"},
-    "game_over_no_winner": {"de": "Match beendet.", "en": "Match finished."},
-    "game_over_player_overview": {"de": "📸 Spielerübersicht", "en": "📸 Player Overview"},
-    "game_over_sets_won": {"de": "Sätze gewonnen:", "en": "Sets Won:"},
-    "game_over_legs_won": {"de": "Legs gewonnen:", "en": "Legs Won:"},
-    "game_over_total_score": {"de": "Gesamtpunktzahl:", "en": "Total Score:"},
-    "game_over_play_again": {"de": "Nochmal spielen / Neues Spiel einrichten", "en": "Play Again / New Game Setup"},
-    "internal_error_score_calc": {"de": "Interner Fehler: Punktberechnung fehlgeschlagen.", "en": "Internal Error: Score calculation failed."},
-    "correct_score_try_again": {"de": "Korrigiere die Eingabe und versuche den Checkout erneut.", "en": "Correct score and try checkout again."},
-
-
-    # Statistics Page
-    "personal_statistics": {"de": "Persönliche Statistiken", "en": "Personal Statistics"},
-    "select_statistic": {"de": "Statistik auswählen:", "en": "Select Statistic:"},
-    "stats_for_account": {"de": "Statistiken für Konto:", "en": "Stats for account:"},
-    "no_data_selected_stat": {"de": "Keine Daten für gewählte Statistik.", "en": "No data for selected statistic."},
-    "visualizations_placeholder": {"de": "Visualisierungen (Diagramme)", "en": "Visualizations (Charts)"},
-    "charts_coming_soon": {"de": "Diagramme folgen bald.", "en": "Charts coming soon."}, # Consider removing if charts implemented
-    "motivation_booster": {"de": "🏆 Motivations-Boost", "en": "🏆 Motivation Booster"},
-    "get_new_quote": {"de": "🔄 Neuen Spruch holen", "en": "🔄 Get New Quote"},
-    "games_played": {"de": "Spiele gespielt", "en": "Games Played"},
-    "games_won": {"de": "Spiele gewonnen", "en": "Games Won"},
-    "legs_won": {"de": "Legs gewonnen", "en": "Legs Won"},
-    "sets_won": {"de": "Sätze gewonnen", "en": "Sets Won"},
-    "win_rate": {"de": "Gewinnrate (%)", "en": "Win Rate (%)"},
-    "total_score": {"de": "Gesamtpunktzahl (Stats)", "en": "Total Score (Stats)"}, # Differentiate if needed
-    "avg_score_turn": {"de": "Avg. Punkte / Aufnahme", "en": "Avg Score / Turn"},
-    "avg_score_dart": {"de": "Avg. Punkte / Dart", "en": "Avg Score / Dart"},
-    "highest_score": {"de": "Höchste Aufnahme", "en": "Highest Score (Turn)"},
-    "total_turns": {"de": "Aufnahmen gesamt", "en": "Total Turns"},
-    "darts_thrown": {"de": "Darts geworfen", "en": "Darts Thrown"},
-    "busts": {"de": "Busts", "en": "Busts"},
-    "error_displaying_table": {"de": "Fehler beim Anzeigen der Tabelle", "en": "Error displaying table"},
-    "no_data_for_statistic": {"de": "Keine Daten für diese Statistik.", "en": "No data for this statistic."}, # Duplicate? Keep one
-    "no_player_stats_yet": {"de": "Noch keine Spielerstatistiken vorhanden.", "en": "No player statistics available yet."},
-    "could_not_load_stats": {"de": "Statistiken konnten nicht geladen werden.", "en": "Could not load statistics."},
-    "no_player_stats_recorded": {"de": "Noch keine Spielerstatistiken erfasst.", "en": "No player stats recorded yet."},
-
-    # Settings Page
-    "settings_title": {"de": "⚙️ Einstellungen & Spieler-Verwaltung", "en": "⚙️ Settings & Player Management"},
-    "manage_players_prefs": {"de": "Verwalte Spieler und Einstellungen für Konto:", "en": "Manage players and preferences for account:"},
-    "set_preferences": {"de": "🎯 Einstellungen festlegen", "en": "🎯 Set Preferences"},
-    "delete_player": {"de": "🗑️ Spieler löschen", "en": "🗑️ Delete Player"},
-    "set_preferred_double_outs": {"de": "Bevorzugte Doppel für Checkouts & Avatare festlegen", "en": "Set Preferred Double Outs & Avatars"}, # Updated
-    "select_player_edit_prefs": {"de": "Wähle Spieler für Einstellungen:", "en": "Select Player to Edit Preferences:"},
-    "save_preferences": {"de": "Einstellungen speichern", "en": "Save Preferences"},
-    "delete_player_data": {"de": "Spielerdaten löschen", "en": "Delete Player Data"},
-    "delete_warning": {"de": "⚠️ Löschen entfernt alle Statistiken und Checkout-Logs dauerhaft!", "en": "⚠️ Deleting removes all stats and checkout logs permanently!"},
-    "no_players_added": {"de": "Noch keine Spieler hinzugefügt.", "en": "No players added yet."},
-    "player_deleted_success": {"de": "Spieler erfolgreich gelöscht.", "en": "Player deleted successfully."},
-    "confirm_deletion": {"de": "Bestätigung für Löschen von", "en": "Confirm Deletion of"},
-    "yes_delete": {"de": "✔️ Ja, Spieler löschen", "en": "✔️ Yes, DELETE Player Data"},
-    "cancel": {"de": "❌ Abbrechen", "en": "❌ Cancel"},
-    "add_players_homepage": {"de": "Spieler auf der Startseite hinzufügen.", "en": "Add players on the Homepage."},
-    "no_players_delete": {"de": "Keine Spieler zum Löschen vorhanden.", "en": "No players to delete."},
-    "language_settings": {"de": "🌐 Spracheinstellungen", "en": "🌐 Language Settings"},
-    "select_new_avatar": {"de": "Wähle deinen neuen Account-Avatar", "en": "Select your new account avatar"},
-    "choose_new_avatar": {"de": "Wähle deinen neuen Avatar:", "en": "Choose your new avatar:"},
-    "preview": {"de": "Vorschau", "en": "Preview"},
-    "save_avatar_choice": {"de": "Avatar-Auswahl speichern", "en": "Save Avatar Choice"},
-    "avatar_updated_success": {"de": "✅ Avatar erfolgreich aktualisiert!", "en": "✅ Avatar updated successfully!"},
-    "change_account_avatar": {"de": "🧩 Account-Avatar ändern", "en": "🧩 Change Account Avatar"},
-    "user_data_error": {"de": "Benutzerdaten nicht gefunden oder Spielerstatistiken fehlen. Bitte neu anmelden oder Spieler auf der Startseite hinzufügen.", "en": "User data not found or player stats missing. Please re-login or add players on Homepage."},
-    "select_avatar_for_player": {"de": "Wähle Avatar für", "en": "Select avatar for"},
-    "choose_emoji_caption": {"de": "Wähle ein Emoji, um diesen Spieler in Spielen und Statistiken darzustellen 📊🎯", "en": "Choose an emoji to represent this player in games and stats 📊🎯"},
-    "select_preferred_doubles_for": {"de": "Wähle bevorzugte Doppel für", "en": "Select preferred doubles for"},
-    "save_prefs_button_label": {"de": "Einstellungen speichern für", "en": "Save Preferences for"},
-    "prefs_saved_success": {"de": "Einstellungen gespeichert für", "en": "Preferences saved for"},
-    "player_not_found_error": {"de": "Spieler nicht gefunden, Einstellungen konnten nicht gespeichert werden (vielleicht gelöscht?).", "en": "Player not found, could not save preferences (maybe deleted?)."},
-    "select_player_to_delete": {"de": "Wähle Spieler zum Löschen:", "en": "Select Player to Delete:"},
-    "delete_button_label": {"de": "Lösche", "en": "Delete"}, # Player name added
-    "confirm_delete_error": {"de": "Bestätige Löschen von", "en": "Confirm Deletion of"}, # Player name added
-    "deleted_success_message": {"de": "Gelöscht:", "en": "Deleted:"}, # Player name added
-    "player_already_deleted_error": {"de": "Spieler nicht gefunden (vielleicht schon gelöscht).", "en": "Player not found (maybe already deleted)."},
-    "deletion_error": {"de": "Ein Fehler ist beim Löschen aufgetreten:", "en": "An error occurred during deletion:"},
-    "choose_player_placeholder": {"de": "Spieler auswählen...", "en": "Choose player..."},
-}
-
-
-# Define helper function to fetch translation based on session state
-def t(key):
-    """Returns the translation for a given key based on selected language."""
-    lang = st.session_state.get("language", "en")  # Default to English
-    # Fallback chain: specific lang -> english -> key itself
-    return translations.get(key, {}).get(lang, translations.get(key, {}).get("en", key))
 
 #page mapping for stable navigation
 page_map = {
@@ -337,15 +150,15 @@ if "app_initialized" not in st.session_state:
 # --- Login / Register Page ---
 if not st.session_state.logged_in:
     st.session_state.current_page = page_map.get("Homepage", "homepage") # Force homepage view when logged out
-    st.title(f"🔐 {t('welcome')}")
+    st.title("🔐 Welcome")
 
-    login_tab, register_tab = st.tabs([t("login"), t("register")])
+    login_tab, register_tab = st.tabs(["login", "register"])
 
     with login_tab:
         with st.form("login_form"):
-            username = st.text_input(t("username"), key="login_user")
-            password = st.text_input(t("password"), type="password", key="login_pass")
-            login_button = st.form_submit_button(t("login"), use_container_width=True)
+            username = st.text_input("username", key="login_user")
+            password = st.text_input("password", type="password", key="login_pass")
+            login_button = st.form_submit_button("login", use_container_width=True)
 
             if login_button:
                 hashed_input_pw = hash_password(password)
@@ -359,15 +172,15 @@ if not st.session_state.logged_in:
                     st.session_state.app_initialized = True # Mark as initialized
                     st.rerun()
                 else:
-                    st.error(t("invalid_login"))
+                    st.error("invalid_login")
 
     with register_tab:
         with st.form("register_form"):
-            new_username = st.text_input(t("username"), key="reg_user").strip()
-            new_password = st.text_input(t("password"), type="password", key="reg_pass")
+            new_username = st.text_input("username", key="reg_user").strip()
+            new_password = st.text_input("password", type="password", key="reg_pass")
 
             # Avatar Selection
-            st.markdown(f"### {t('select_new_avatar')}")
+            st.markdown("### Select a New Avatar")
             avatar_styles = ["avataaars", "bottts", "croodles", "identicon", "pixel-art"] # Example styles
             avatar_seeds = ["Hero", "Champ", "Legend", "Master", "Bullseye"] # Example seeds
             avatar_options = []
@@ -378,7 +191,7 @@ if not st.session_state.logged_in:
                  avatar_options.append((f"{style}_{seed}", avatar_url))
 
             selected_avatar_key = st.radio(
-                t("choose_new_avatar"),
+                "Choose a new avatar",
                 options=[option[0] for option in avatar_options],
                 format_func=lambda x: x.split("_")[1].capitalize(), # Show seed name
                 horizontal=True,
@@ -392,14 +205,14 @@ if not st.session_state.logged_in:
                     selected_avatar_url_preview = url
                     break
             if selected_avatar_url_preview:
-                 st.image(selected_avatar_url_preview, width=120, caption=t("preview"))
+                 st.image(selected_avatar_url_preview, width=120, caption="Preview")
 
-            reg_button = st.form_submit_button(t("register"), use_container_width=True)
+            reg_button = st.form_submit_button("register", use_container_width=True)
             if reg_button:
                 if not new_username or not new_password:
-                    st.warning(t("empty_credentials"))
+                    st.warning("empty_credentials")
                 elif new_username in users:
-                    st.warning(t("user_exists"))
+                    st.warning("user_exists")
                 else:
                     hashed_pw = hash_password(new_password)
                     users[new_username] = {
@@ -410,7 +223,7 @@ if not st.session_state.logged_in:
                         "checkout_log": []
                     }
                     save_users(users)
-                    st.success(t("registration_successful_login")) # Use a specific translation key
+                    st.success("registration_successful_login") # Use a specific translation key
                     # Consider auto-login or just prompt
     st.stop() # Stop execution here if not logged in
 
@@ -447,7 +260,7 @@ if "nav_target" in st.session_state:
 
 # Render Navigation Radio
 chosen_page_visible_name = st.sidebar.radio(
-    t("navigation"),
+    "navigation",
     page_options,
     index=current_page_index,
     key="nav_radio", # Use a consistent key
@@ -464,18 +277,18 @@ if internal_chosen_page != st.session_state.current_page:
         st.rerun() # Rerun to load the new page content
     else:
         # If nav is disabled, show a warning instead of changing page
-        st.sidebar.warning(t("finish_quit_game"))
+        st.sidebar.warning("finish_quit_game")
 # Handle direct navigation attempt to Game page when not started (edge case)
 elif chosen_page_visible_name == "Game" and st.session_state.current_page != "game":
-     st.sidebar.warning(t("start_game_homepage"))
+     st.sidebar.warning("start_game_homepage")
      # Prevent navigation by resetting to current page if needed (might cause loop without care)
      # Or simply do nothing, the warning should suffice
 
 # Sidebar actions specific to the Game page
 if st.session_state.current_page == "game" and not st.session_state.game_over:
-    st.sidebar.warning(t("game_in_progress"))
+    st.sidebar.warning("game_in_progress")
     # Renamed "Quit" button to "End Game Early"
-    if st.sidebar.button(t("end_game_early")): # Using translation key
+    if st.sidebar.button("end_game_early"): # Using translation key
         # Logic to end game early (same as original quit logic)
         st.session_state.current_page = page_map.get("Homepage", "homepage") # Go back home
         st.session_state.game_over = True # Mark game as over (will show game over screen briefly on home?)
@@ -487,7 +300,7 @@ if st.session_state.current_page == "game" and not st.session_state.game_over:
 
 st.sidebar.markdown("---")
 # Logout Button
-if st.sidebar.button(t("logout")):
+if st.sidebar.button("logout"):
         # Clear session state more thoroughly on logout
         logged_in_user = st.session_state.username # Keep track for potential save?
         keys_to_keep = ["app_initialized"] # Maybe keep language? Depends on preference
@@ -508,13 +321,13 @@ if st.sidebar.button(t("logout")):
 
 # --- Homepage ---
 if st.session_state.current_page == "homepage":
-    st.title(f"🎯 {t('homepage')}")
-    st.markdown(f"{t('configure_game')} **{st.session_state.username}**!")
-
-    game_mode_tabs = st.tabs([t("x01_setup"), t("cricket_soon")])
-
+    st.title("🎯 Homepage")
+    st.markdown(f"Configure a new game, **{st.session_state.username}**!")
+ 
+    game_mode_tabs = st.tabs(["X01 Setup", "Cricket (soon)"])
+ 
     with game_mode_tabs[0]: # X01 Setup Tab
-        st.subheader(t("x01_options"))
+        st.subheader("X01 Options")
 
         # --- Game Settings Columns ---
         col1, col2, col3 = st.columns(3)
@@ -525,7 +338,7 @@ if st.session_state.current_page == "homepage":
             except ValueError:
                 default_points_index = points_options.index("501")
             selected_points = st.selectbox(
-                t("x01_mode"), # Using new translation key
+                "X01 Mode", # Using new translation key
                 points_options,
                 index=default_points_index,
                 key="sb_game_mode"
@@ -539,7 +352,7 @@ if st.session_state.current_page == "homepage":
             except ValueError:
                 default_checkout_index = checkout_options.index("Double Out")
             selected_checkout = st.selectbox(
-                t("check_out_mode"), # Using new translation key
+                "Checkout", # Using new translation key
                 checkout_options,
                 index=default_checkout_index,
                 key="sb_checkout_mode"
@@ -553,7 +366,7 @@ if st.session_state.current_page == "homepage":
             except ValueError:
                 default_sets_index = sets_options.index(1)
             selected_sets = st.selectbox(
-                t("sets_to_win"), # Using new translation key
+                "Sets to Win", # Using new translation key
                 sets_options,
                 index=default_sets_index,
                 key="sb_sets"
@@ -568,7 +381,7 @@ if st.session_state.current_page == "homepage":
             except ValueError:
                 default_set_leg_index = set_leg_options.index("First to")
             selected_set_leg = st.selectbox(
-                t("leg_set_rule"), # Using new translation key
+                "Leg/Set Rule", # Using new translation key
                 set_leg_options,
                 index=default_set_leg_index,
                 key="sb_set_leg_rule"
@@ -582,7 +395,7 @@ if st.session_state.current_page == "homepage":
             except ValueError:
                 default_checkin_index = checkin_options.index("Straight In")
             selected_checkin = st.selectbox(
-                t("check_in_mode"), # Using new translation key
+                "Check-in", # Using new translation key
                 checkin_options,
                 index=default_checkin_index,
                 key="sb_checkin_mode",
@@ -597,7 +410,7 @@ if st.session_state.current_page == "homepage":
             except ValueError:
                 default_legs_index = legs_options.index(1)
             selected_legs = st.selectbox(
-                t("legs_per_set"), # Using new translation key
+                "Legs per Set", # Using new translation key
                 legs_options,
                 index=default_legs_index,
                 key="sb_legs"
@@ -606,7 +419,7 @@ if st.session_state.current_page == "homepage":
 
         # --- Player Selection / Add Player ---
         st.markdown("---")
-        st.subheader(t("players"))
+        st.subheader("Players")
         available_players = []
         current_username_hp = st.session_state.username
         if current_username_hp and current_username_hp in users:
@@ -614,10 +427,10 @@ if st.session_state.current_page == "homepage":
             player_stats_dict_hp = users[current_username_hp].setdefault("player_stats", {})
             available_players = sorted(list(player_stats_dict_hp.keys()))
         else:
-            st.error(t("user_data_error")) # More specific error
+            st.error("user_data_error") # More specific error
 
         selected_players_list = st.multiselect(
-            t("select_players_for_game"),
+            "Select players for game (incl. yourself if playing!)",
             options=available_players,
             default=st.session_state.get("players_selected_for_game", []), # Use .get for safety
             key="multiselect_players"
@@ -625,11 +438,11 @@ if st.session_state.current_page == "homepage":
         # Update session state immediately after selection
         st.session_state.players_selected_for_game = selected_players_list
 
-        with st.expander(t("add_manage_players")):
-            st.write(t("add_new_player_info"))
-            new_player_name_from_input = st.text_input(t("new_player_name"), key="new_player_name_input").strip()
+        with st.expander("Add / Manage Players"):
+            st.write("Add new players (including yourself) to track stats & set preferences.")
+            new_player_name_from_input = st.text_input("New Player Name", key="new_player_name_input").strip()
 
-            if st.button(t("add_player_button")):
+            if st.button("➕ Add Player"):
                 if new_player_name_from_input:
                     if current_username_hp and current_username_hp in users:
                         # Ensure 'player_stats' exists before trying to add to it
@@ -654,18 +467,18 @@ if st.session_state.current_page == "homepage":
                         st.error("Error saving player: User not found.")
                 else:
                     st.warning("Please enter a name.")
-            st.caption(t("edit_delete_in_settings"))
+            st.caption("Edit preferences or delete players in '⚙️ Settings'.")
 
         st.markdown("---")
 
         # --- Start Game Button ---
-        if st.button(t("start_game_button"), type="primary", use_container_width=True):
+        if st.button("Start Game", type="primary", use_container_width=True):
             players_to_start = st.session_state.players_selected_for_game
             # Validate selections
             if not players_to_start:
-                st.warning(t("warning_select_players"))
+                st.warning("⚠️ Select players.")
             elif not st.session_state.game_mode or st.session_state.game_mode not in [101, 201, 301, 401, 501]:
-                st.warning(t("warning_select_x01_mode"))
+                st.warning("⚠️ Select X01 mode.")
             else:
                 # Initialize game state
                 st.session_state.starting_score = st.session_state.game_mode
@@ -700,12 +513,12 @@ if st.session_state.current_page == "homepage":
 
 # --- Statistics Page ---
 elif st.session_state.current_page == "statistics":
-    st.title(f"📊 {t('personal_statistics')}")
-    st.write(f"{t('stats_for_account')} **{st.session_state.username}**")
+    st.title("📊 Your Statistics")
+    st.write(f"Stats for **{st.session_state.username}**")
 
     # Motivation Booster (API-powered with refresh button)
     st.markdown("---")
-    st.subheader(t("motivation_booster"))
+    st.subheader("Motivation Booster")
 
     # Use session state to store the quote to avoid re-fetching on every interaction
     if "motivational_quote" not in st.session_state:
@@ -715,12 +528,12 @@ elif st.session_state.current_page == "statistics":
     st.info(st.session_state.motivational_quote)
 
     # Refresh button to get a new quote
-    if st.button(t("get_new_quote")):
+    if st.button("Get New Quote"):
         st.session_state.motivational_quote = get_motivational_quote()
         st.rerun() # Refresh the page to show the new quote
 
     st.markdown("---")
-    st.subheader(t("player_stats_header")) # Add this key to translations if needed
+    st.subheader("Player Stats") # Add this key to translations if needed
 
     current_username_stats = st.session_state.username
     # Safely access player stats
@@ -741,30 +554,30 @@ elif st.session_state.current_page == "statistics":
                 avg_score_dart = (total_score / darts_thrown) if darts_thrown > 0 else 0
 
                 data_for_df.append({
-                    t("player"): player,
-                    t("games_played"): games_played,
-                    t("games_won"): games_won,
-                    t("legs_won"): stats.get("legs_won", 0),
-                    t("sets_won"): stats.get("sets_won", 0),
-                    t("win_rate"): f"{win_rate:.2f}%",
-                    t("total_score"): total_score,
-                    t("avg_score_turn"): f"{avg_score_turn:.2f}",
-                    t("avg_score_dart"): f"{avg_score_dart:.2f}",
-                    t("highest_score"): stats.get("highest_score", 0),
-                    t("total_turns"): total_turns,
-                    t("darts_thrown"): darts_thrown,
-                    t("busts"): stats.get("num_busts", 0)
+                    "player": player,
+                    "games_played": games_played,
+                    "games_won": games_won,
+                    "legs_won": stats.get("legs_won", 0),
+                    "sets_won": stats.get("sets_won", 0),
+                    "win_rate": f"{win_rate:.2f}%",
+                    "total_score": total_score,
+                    "avg_score_turn": f"{avg_score_turn:.2f}",
+                    "avg_score_dart": f"{avg_score_dart:.2f}",
+                    "highest_score": stats.get("highest_score", 0),
+                    "total_turns": total_turns,
+                    "darts_thrown": darts_thrown,
+                    "busts": stats.get("num_busts", 0)
                 })
 
             if data_for_df:
                 try:
                     df = pd.DataFrame(data_for_df)
-                    df = df.set_index(t("player")) # Set player name as index
+                    df = df.set_index("player") # Set player name as index
                     st.dataframe(df, use_container_width=True)
 
                     # --- Visualizations ---
                     st.markdown("---")
-                    st.subheader(t("visualizations_placeholder"))
+                    st.subheader("visualizations_placeholder")
 
                     # Check if data exists before plotting
                     if not df.empty:
@@ -777,18 +590,18 @@ elif st.session_state.current_page == "statistics":
                         with col1:
                             fig1, ax1 = plt.subplots()
                             df_plot['games_played'].plot(kind='bar', ax=ax1, color='skyblue')
-                            ax1.set_title(t("games_played"))
-                            ax1.set_ylabel(t("games"))
-                            ax1.set_xlabel(t("player"))
+                            ax1.set_title("games_played")
+                            ax1.set_ylabel("games")
+                            ax1.set_xlabel("player")
                             plt.xticks(rotation=45, ha='right')
                             plt.tight_layout()
                             st.pyplot(fig1)
 
                             fig3, ax3 = plt.subplots()
                             df_plot['avg_score_per_turn'].plot(kind='bar', ax=ax3, color='orange')
-                            ax3.set_title(t("avg_score_turn"))
-                            ax3.set_ylabel(t("avg_short") + " " + t("score"))
-                            ax3.set_xlabel(t("player"))
+                            ax3.set_title("avg_score_turn")
+                            ax3.set_ylabel("avg_short" + " " + "score")
+                            ax3.set_xlabel("player")
                             plt.xticks(rotation=45, ha='right')
                             plt.tight_layout()
                             st.pyplot(fig3)
@@ -796,9 +609,9 @@ elif st.session_state.current_page == "statistics":
                         with col2:
                             fig2, ax2 = plt.subplots()
                             df_plot['win_rate'].plot(kind='bar', ax=ax2, color='lightgreen')
-                            ax2.set_title(t("win_rate"))
-                            ax2.set_ylabel(t("win_rate"))
-                            ax2.set_xlabel(t("player"))
+                            ax2.set_title("win_rate")
+                            ax2.set_ylabel("win_rate")
+                            ax2.set_xlabel("player")
                             ax2.yaxis.set_major_formatter(plt.FuncFormatter('{:.0f}%'.format))
                             plt.xticks(rotation=45, ha='right')
                             plt.tight_layout()
@@ -806,9 +619,9 @@ elif st.session_state.current_page == "statistics":
 
                             fig4, ax4 = plt.subplots()
                             df_plot['highest_score'].plot(kind='bar', ax=ax4, color='salmon')
-                            ax4.set_title(t("highest_score"))
-                            ax4.set_ylabel(t("score"))
-                            ax4.set_xlabel(t("player"))
+                            ax4.set_title("highest_score")
+                            ax4.set_ylabel("score")
+                            ax4.set_xlabel("player")
                             plt.xticks(rotation=45, ha='right')
                             plt.tight_layout()
                             st.pyplot(fig4)
@@ -816,59 +629,36 @@ elif st.session_state.current_page == "statistics":
                         # Single column chart for darts thrown
                         fig5, ax5 = plt.subplots()
                         df_plot['darts_thrown'].plot(kind='bar', ax=ax5, color='purple')
-                        ax5.set_title(t("darts_thrown"))
-                        ax5.set_ylabel(t("darts"))
-                        ax5.set_xlabel(t("player"))
+                        ax5.set_title("darts_thrown")
+                        ax5.set_ylabel("darts")
+                        ax5.set_xlabel("player")
                         plt.xticks(rotation=45, ha='right')
                         plt.tight_layout()
                         st.pyplot(fig5)
 
                     else:
-                         st.info(t("no_player_stats_recorded"))
+                         st.info("no_player_stats_recorded")
 
                 except Exception as e:
-                    st.error(f"{t('error_displaying_table')}: {e}")
+                    st.error(f"{'error_displaying_table'}: {e}")
             else:
-                st.info(t("no_data_for_statistic")) # Or player stats?
+                st.info("no_data_for_statistic") # Or player stats?
         else:
-            st.info(t("no_player_stats_yet"))
+            st.info("no_player_stats_yet")
     else:
-        st.warning(t("could_not_load_stats"))
+        st.warning("could_not_load_stats")
 
 
 # --- Settings Page ---
 elif st.session_state.current_page == "settings":
-    st.title(t("settings_title"))
-    st.write(f"{t('manage_players_prefs')} **{st.session_state.username}**")
+    st.title("⚙️ Settings")
+    st.write(f"Manage players and preferences for **{st.session_state.username}**")
     st.markdown("---")
 
-    # Language Settings Expander
-    with st.expander(t("language_settings")):
-        # Determine current language index
-        current_lang_code = st.session_state.get("language", "en")
-        lang_options = ["en", "de"]
-        try:
-            current_lang_index = lang_options.index(current_lang_code)
-        except ValueError:
-            current_lang_index = 0 # Default to English if state is somehow invalid
-
-        selected_lang_code = st.selectbox(
-            t("select_language"),
-            options=lang_options,
-            index=current_lang_index,
-            format_func=lambda x: "English" if x == "en" else "Deutsch",
-            key="lang_select_settings"
-        )
-        # Update language if changed
-        if selected_lang_code != current_lang_code:
-            st.session_state.language = selected_lang_code
-            st.success("✅ Language updated!")
-            time.sleep(0.5) # Brief pause for feedback
-            st.rerun()
 
     # Account Avatar Expander
-    with st.expander(t("change_account_avatar")):
-        st.markdown(f"### {t('select_new_avatar')}")
+    with st.expander("Change Account Avatar"):
+        st.markdown("### Select a New Avatar")
 
         # Use the same consistent avatar options as registration
         avatar_styles = ["avataaars", "bottts", "croodles", "identicon", "pixel-art"]
@@ -886,7 +676,7 @@ elif st.session_state.current_page == "settings":
              default_avatar_index = 0 # Default to first if current is somehow invalid
 
         selected_avatar_key_settings = st.radio(
-            t("choose_new_avatar"),
+            "Choose a new avatar",
             options=[option[0] for option in avatar_options_settings],
             index=default_avatar_index,
             format_func=lambda x: x.split("_")[1].capitalize(),
@@ -901,14 +691,14 @@ elif st.session_state.current_page == "settings":
                  selected_avatar_url_settings_preview = url
                  break
         if selected_avatar_url_settings_preview:
-             st.image(selected_avatar_url_settings_preview, width=120, caption=t("preview"))
+             st.image(selected_avatar_url_settings_preview, width=120, caption="preview")
 
         # Save button
-        if st.button(t("save_avatar_choice"), key="save_account_avatar_settings"):
+        if st.button("save_avatar_choice", key="save_account_avatar_settings"):
             if st.session_state.username in users:
                 users[st.session_state.username]["avatar_choice"] = selected_avatar_key_settings
                 save_users(users)
-                st.success(t("avatar_updated_success"))
+                st.success("avatar_updated_success")
                 time.sleep(1)
                 st.rerun() # Rerun to update sidebar image immediately
             else:
@@ -921,7 +711,7 @@ elif st.session_state.current_page == "settings":
     current_username_settings = st.session_state.username
     # Ensure user and player_stats exist before accessing
     if current_username_settings not in users or "player_stats" not in users.get(current_username_settings, {}):
-        st.error(t("user_data_error"))
+        st.error("user_data_error")
         st.stop() # Stop rendering this part if data is missing
 
     # Safely get player_stats dictionary
@@ -929,23 +719,23 @@ elif st.session_state.current_page == "settings":
     players_list_settings = sorted(list(player_stats_dict_settings.keys()))
 
     if not players_list_settings:
-         st.warning(t("no_players_added"))
-         st.info(t("add_players_homepage"))
+         st.warning("no_players_added")
+         st.info("add_players_homepage")
     else:
-        tab_prefs, tab_delete = st.tabs([t("set_preferences"), t("delete_player")])
+        tab_prefs, tab_delete = st.tabs(["set_preferences", "delete_player"])
 
         # --- Preferences Tab ---
         with tab_prefs:
-            st.subheader(t("set_preferred_double_outs")) # Updated title
+            st.subheader("set_preferred_double_outs") # Updated title
             # st.write("Select preferred doubles and an emoji avatar for each player.") # Already in subheader
 
             # Select Player to Edit
             player_to_edit = st.selectbox(
-                t("select_player_edit_prefs"),
+                "Select a player to edit preferences",
                 players_list_settings,
                 key="edit_prefs_player_select",
                 index=None, # No default selection
-                placeholder=t("choose_player_placeholder")
+                placeholder="Choose a player"
             )
 
             if player_to_edit:
@@ -964,33 +754,33 @@ elif st.session_state.current_page == "settings":
                     current_emoji_index = 0 # Default to first emoji
 
                 selected_avatar_emoji = st.selectbox(
-                    f"{t('select_avatar_for_player')} **{player_to_edit}**:",
+                    f"Select avatar for **{player_to_edit}**:",
                     emoji_options,
                     index=current_emoji_index,
                     key=f"avatar_emoji_select_{player_to_edit}" # Unique key per player
                 )
-                st.caption(t("choose_emoji_caption"))
+                st.caption("Choose an emoji avatar for the player.")
 
                 # --- Preferred Doubles Selection ---
                 selected_doubles = st.multiselect(
-                    f"{t('select_preferred_doubles_for')} **{player_to_edit}**:",
+                    f"Select preferred doubles for **{player_to_edit}**:",
                     options=ALL_POSSIBLE_DOUBLES,
                     default=current_preferences_formatted,
                     key=f"pref_doubles_multiselect_{player_to_edit}", # Unique key per player
                 )
 
                 # --- Save Button ---
-                if st.button(f"{t('save_prefs_button_label')} {player_to_edit}", type="primary", key=f"save_prefs_{player_to_edit}"):
+                if st.button(f"Save Preferences for {player_to_edit}", type="primary", key=f"save_prefs_{player_to_edit}"):
                     # Re-check player exists before saving (paranoid check)
                     if player_to_edit in users[current_username_settings].get("player_stats", {}):
                         users[current_username_settings]["player_stats"][player_to_edit]['preferred_doubles'] = selected_doubles
                         users[current_username_settings]["player_stats"][player_to_edit]["avatar"] = selected_avatar_emoji
                         save_users(users)
-                        st.success(f"{t('prefs_saved_success')} {player_to_edit}!")
+                        st.success(f"Preferences saved for {player_to_edit}!")
                         time.sleep(1)
                         # No rerun needed usually, changes are saved. Can add if state needs refresh.
                     else:
-                        st.error(t("player_not_found_error"))
+                        st.error("player_not_found_error")
             else:
                  # Show placeholder text if no player is selected
                  st.info("Select a player above to edit their preferences.")
@@ -998,24 +788,24 @@ elif st.session_state.current_page == "settings":
 
         # --- Delete Player Tab ---
         with tab_delete:
-            st.subheader(t("delete_player_data"))
-            st.warning(t("delete_warning"))
+            st.subheader("delete_player_data")
+            st.warning("delete_warning")
 
             # Initialize confirmation state if needed
             if "confirm_delete_player" not in st.session_state:
                 st.session_state.confirm_delete_player = None
 
             player_to_delete = st.selectbox(
-                t("select_player_to_delete"),
+                "Select player to delete",
                 players_list_settings, # Use the list derived for settings
                 index=None, # No default selection
-                placeholder=t("choose_player_placeholder"),
+                placeholder="Choose a player",
                 key="delete_player_select_settings_tab" # Unique key
             )
 
             # Button to initiate deletion confirmation
             delete_button_disabled = (player_to_delete is None) or (st.session_state.confirm_delete_player == player_to_delete)
-            delete_button_label = f"{t('delete_button_label')} {player_to_delete}" if player_to_delete else f"{t('delete_button_label')}..."
+            delete_button_label = f"Delete {player_to_delete}" if player_to_delete else "Delete..."
 
             if st.button(delete_button_label, type="secondary", disabled=delete_button_disabled, key="settings_delete_request_btn"):
                  if player_to_delete:
@@ -1026,10 +816,10 @@ elif st.session_state.current_page == "settings":
             if st.session_state.confirm_delete_player:
                 # Only show confirmation if the currently selected player matches the one pending confirmation
                 if player_to_delete == st.session_state.confirm_delete_player:
-                    st.error(f"**{t('confirm_delete_error')} {st.session_state.confirm_delete_player}?**")
+                    st.error(f"**Are you sure you want to delete {st.session_state.confirm_delete_player}?**")
                     col_confirm, col_cancel = st.columns(2)
                     with col_confirm:
-                        if st.button(t("yes_delete"), type="primary", use_container_width=True, key="settings_confirm_delete_btn"):
+                        if st.button("yes_delete", type="primary", use_container_width=True, key="settings_confirm_delete_btn"):
                             try:
                                 player_name_confirmed = st.session_state.confirm_delete_player
                                 # Final check if player exists before deleting
@@ -1042,19 +832,19 @@ elif st.session_state.current_page == "settings":
                                             if entry.get("player") != player_name_confirmed
                                         ]
                                     save_users(users)
-                                    st.success(f"{t('deleted_success_message')} {player_name_confirmed}.")
+                                    st.success(f"Successfully deleted {player_name_confirmed}.")
                                 else:
-                                    st.error(t("player_already_deleted_error"))
+                                    st.error("player_already_deleted_error")
 
                                 st.session_state.confirm_delete_player = None # Reset confirmation state
                                 time.sleep(1)
                                 st.rerun() # Refresh page to update player lists
                             except Exception as e:
-                                st.error(f"{t('deletion_error')} {e}")
+                                st.error(f"Error deleting player: {e}")
                                 st.session_state.confirm_delete_player = None
                                 st.rerun()
                     with col_cancel:
-                         if st.button(t("cancel"), type="secondary", use_container_width=True, key="settings_cancel_delete_btn"):
+                         if st.button("cancel", type="secondary", use_container_width=True, key="settings_cancel_delete_btn"):
                               st.session_state.confirm_delete_player = None # Reset confirmation state
                               st.rerun() # Rerun to hide confirmation controls
                 else:
@@ -1097,7 +887,7 @@ elif st.session_state.current_page == "game":
                     value = num
                     # Handle 50 explicitly entered - guide user to D25
                     if num == 50:
-                         st.toast(t("toast_use_d25"), icon="💡")
+                         st.toast("toast_use_d25", icon="💡")
                          is_valid = False # Treat direct 50 as invalid input here
                          value = 0 # Reset value
                 else: is_valid = False # Single number out of range
@@ -1165,7 +955,7 @@ elif st.session_state.current_page == "game":
 
         # Handle calculation error (e.g., if an invalid shot string somehow got processed)
         if calculated_score is None:
-            st.error(t("internal_error_score_calc"))
+            st.error("internal_error_score_calc")
             st.session_state.state_before_last_turn = None # Invalidate undo state on error
             return # Stop processing this turn
 
@@ -1180,10 +970,10 @@ elif st.session_state.current_page == "game":
         if new_score < 0 or new_score == 1:
             is_bust = True
             turn_result_for_log = "BUST"
-            st.toast(f"{t('toast_bust')} {score_before_turn}", icon="❌")
+            st.toast(f"{'toast_bust'} {score_before_turn}", icon="❌")
             # Score remains unchanged on bust
             st.session_state.player_scores[player_name] = score_before_turn
-            st.session_state.message = f"{player_name} {t('toast_player_busted')}"
+            st.session_state.message = f"{player_name} {'toast_player_busted'}"
 
         # 2. Check for Exact Zero (Potential Win)
         elif new_score == 0:
@@ -1193,16 +983,16 @@ elif st.session_state.current_page == "game":
                 is_bust = True # Set bust flag for advancement logic
                 valid_checkout_attempt = False # Mark attempt as invalid
                 turn_result_for_log = "BUST (Invalid Checkout)"
-                st.toast(f"{t('toast_invalid_checkout')} {score_before_turn}", icon="❌")
+                st.toast(f"{'toast_invalid_checkout'} {score_before_turn}", icon="❌")
                 st.session_state.player_scores[player_name] = score_before_turn # Score remains
-                st.session_state.message = f"{player_name} {t('toast_player_invalid_checkout')}"
+                st.session_state.message = f"{player_name} {'toast_player_invalid_checkout'}"
             else:
                 # Valid Win!
                 is_win = True
                 turn_result_for_log = "WIN"
-                st.toast(f"{t('toast_game_shot_leg')} {player_name} {t('toast_wins_leg')} {st.session_state.current_leg}!", icon="🎯")
+                st.toast(f"{'toast_game_shot_leg'} {player_name} {'toast_wins_leg'} {st.session_state.current_leg}!", icon="🎯")
                 st.session_state.player_scores[player_name] = 0 # Set score to 0
-                st.session_state.message = f"{player_name} {t('toast_wins_leg')} {st.session_state.current_leg}!"
+                st.session_state.message = f"{player_name} {'toast_wins_leg'} {st.session_state.current_leg}!"
                 st.session_state.leg_over = True # Signal leg end
                 # Increment leg count in session state immediately for checks
                 st.session_state.player_legs_won[player_name] = st.session_state.player_legs_won.get(player_name, 0) + 1
@@ -1215,7 +1005,7 @@ elif st.session_state.current_page == "game":
         else:
             turn_result_for_log = "OK"
             st.session_state.player_scores[player_name] = new_score
-            st.session_state.message = f"{player_name} {t('toast_player_scored')} {calculated_score}."
+            st.session_state.message = f"{player_name} {'toast_player_scored'} {calculated_score}."
 
         # --- Update Turn History and Last Turn Display ---
         # Append regardless of bust/win/ok, but log includes result type
@@ -1268,7 +1058,7 @@ elif st.session_state.current_page == "game":
                 log_list = users[current_username_stats_update].setdefault("checkout_log", [])
                 log_list.append(log_entry)
             except Exception as e:
-                st.error(f"{t('toast_log_error')} {e}")
+                st.error(f"{'toast_log_error'} {e}")
 
         # --- Save User Data Once After All Turn Updates ---
         save_users(users)
@@ -1282,7 +1072,7 @@ elif st.session_state.current_page == "game":
         # This allows the player to correct their input for the *same* turn.
         if not valid_checkout_attempt and new_score == 0:
             should_advance_turn = False
-            st.warning(t("correct_score_try_again")) # Prompt user
+            st.warning("correct_score_try_again") # Prompt user
 
         if should_advance_turn:
             index_before_advance = st.session_state.current_player_index # Store index before changing it
@@ -1306,7 +1096,7 @@ elif st.session_state.current_page == "game":
                 if st.session_state.player_legs_won.get(player_name, 0) >= legs_needed:
                     st.session_state.set_over = True
                     st.session_state.player_sets_won[player_name] = st.session_state.player_sets_won.get(player_name, 0) + 1
-                    st.success(f"🎉 {player_name} {t('toast_player_wins_set')} {st.session_state.current_set}!")
+                    st.success(f"🎉 {player_name} {'toast_player_wins_set'} {st.session_state.current_set}!")
                     # Update persistent set win stat
                     if player_name in users[current_username_stats_update]["player_stats"]:
                          users[current_username_stats_update]["player_stats"][player_name]["sets_won"] = users[current_username_stats_update]["player_stats"][player_name].get("sets_won",0)+1
@@ -1338,7 +1128,7 @@ elif st.session_state.current_page == "game":
 
                     else:
                         # --- SET OVER, but Game Not Over -> Start Next Set ---
-                        st.toast(t("toast_prepare_next_set"), icon="⏳")
+                        st.toast("toast_prepare_next_set", icon="⏳")
                         time.sleep(1.5)
                         st.session_state.current_set += 1
                         st.session_state.current_leg = 1 # Reset leg counter for new set
@@ -1354,7 +1144,7 @@ elif st.session_state.current_page == "game":
 
                 else:
                     # --- LEG OVER, but Set Not Over -> Start Next Leg ---
-                    st.toast(t("toast_prepare_next_leg"), icon="⏳")
+                    st.toast("toast_prepare_next_leg", icon="⏳")
                     time.sleep(1.5)
                     st.session_state.current_leg += 1
                     # Reset scores for the new leg
@@ -1470,7 +1260,7 @@ elif st.session_state.current_page == "game":
                 # Ensure we are actually setting up (needed score > 0) and leave is valid
                 if needed_score > 0 and target_leave >= 2:
                     # Suggest hitting the single 'needed_score'
-                    return f"{needed_score} ({t('leaves_short')} {target_leave})" # Use translation key
+                    return f"{needed_score} ({'leaves_short'} {target_leave})" # Use translation key
 
         # Fallback: If no preferred leave is reachable with one single, suggest hitting highest possible single? (Less common strategy)
         # Or simply return None if no simple setup found.
@@ -1501,15 +1291,15 @@ elif st.session_state.current_page == "game":
 
     # --- Check Game State ---
     if st.session_state.game_over:
-        st.title(t("game_over_title"))
+        st.title("🏁 Game Over")
         if st.session_state.winner:
-            st.header(f"🏆 {t('game_over_winner_header')} {st.session_state.winner} 🏆")
+            st.header(f"🏆 Winner: {st.session_state.winner} 🏆")
         else:
-            st.header(t("game_over_no_winner")) # e.g., if ended early
+            st.header("game_over_no_winner") # e.g., if ended early
         st.balloons()
 
         st.markdown("---")
-        st.subheader(t("game_over_player_overview"))
+        st.subheader("Player Overview")
 
         current_username_gameover = st.session_state.username
         player_stats_gameover = users.get(current_username_gameover, {}).get("player_stats", {})
@@ -1526,17 +1316,17 @@ elif st.session_state.current_page == "game":
                      avatar_emoji = player_data.get("avatar", "🎯")
                      st.markdown(f"<p style='font-size: 40px; text-align: center;'>{avatar_emoji}</p>", unsafe_allow_html=True)
                      st.markdown(f"**<p style='text-align: center;'>{player}</p>**", unsafe_allow_html=True)
-                     st.markdown(f"{t('game_over_sets_won')} {st.session_state.player_sets_won.get(player, 0)}")
-                     st.markdown(f"{t('game_over_legs_won')} {st.session_state.player_legs_won.get(player, 0)}")
+                     st.markdown(f"Sets Won: {st.session_state.player_sets_won.get(player, 0)}")
+                     st.markdown(f"Legs Won: {st.session_state.player_legs_won.get(player, 0)}")
                      # Calculate score from history (more accurate than final score if game ended mid-leg)
                      history = st.session_state.player_turn_history.get(player, [])
                      total_score_in_game = sum(t[0] for t in history if len(t)>2 and not t[2].startswith("BUST")) # Sum non-bust scores
-                     st.markdown(f"{t('game_over_total_score')} {total_score_in_game}")
+                     st.markdown(f"Total Score: {total_score_in_game}")
         else:
              st.warning("No player data found for game summary.")
 
 
-        if st.button(t("game_over_play_again"), use_container_width=True, type="primary"):
+        if st.button("Play Again", use_container_width=True, type="primary"):
             # Reset essential game states for a new game setup on homepage
             st.session_state.players_selected_for_game = [] # Clear selected players
             st.session_state.game_over = True # Keep game over conceptually until new game starts
@@ -1548,16 +1338,16 @@ elif st.session_state.current_page == "game":
 
     # --- Check if Players are Selected ---
     if not st.session_state.players_selected_for_game:
-         st.error(t("no_players_in_game_warning"))
-         if st.button(t("back_to_homepage"), use_container_width=True):
+         st.error("no_players_in_game_warning")
+         if st.button("back_to_homepage", use_container_width=True):
              st.session_state.current_page = page_map.get("Homepage", "homepage")
              st.session_state.nav_target = reverse_page_map.get("homepage", "Homepage")
              st.rerun()
          st.stop() # Stop if no players
 
     # --- Game Interface ---
-    st.title(f"🎯 {t('game_on')}: {st.session_state.game_mode} - {t('set')} {st.session_state.current_set}/{st.session_state.sets_to_play} | {t('leg')} {st.session_state.current_leg}/{st.session_state.legs_to_play}")
-    st.caption(f"{t('mode')}: {st.session_state.check_out_mode} ({st.session_state.check_in_mode}) | {t('rule')}: {st.session_state.set_leg_rule}")
+    st.title(f"🎯 {'game_on'}: {st.session_state.game_mode} - {'set'} {st.session_state.current_set}/{st.session_state.sets_to_play} | {'leg'} {st.session_state.current_leg}/{st.session_state.legs_to_play}")
+    st.caption(f"{'mode'}: {st.session_state.check_out_mode} ({st.session_state.check_in_mode}) | {'rule'}: {st.session_state.set_leg_rule}")
 
     # --- REMOVED Motivational Quote During Game ---
     # quote = get_motivational_quote()
@@ -1568,7 +1358,7 @@ elif st.session_state.current_page == "game":
 
     with left_col:
         # --- Scoreboard Display ---
-        st.subheader(t("scores_header"))
+        st.subheader("scores_header")
         num_players = len(st.session_state.players_selected_for_game)
         if num_players > 0:
             current_player_index_safe = st.session_state.current_player_index % num_players # Ensure index is valid
@@ -1622,7 +1412,7 @@ elif st.session_state.current_page == "game":
                         # Display score thrown this turn if applicable
                         turn_total_display = ""
                         if is_current_player and partial_turn_score > 0 and not is_potential_bust:
-                            turn_total_display = f"({partial_turn_score} {t('thrown')})" # Add translation if needed
+                            turn_total_display = f"({partial_turn_score} thrown)"
                         # Use a non-breaking space for consistent height when empty
                         st.markdown(f"<p style='text-align: center; font-size: 1.1em; color: blue; margin-bottom: 2px; height: 1.3em;'>{turn_total_display or '&nbsp;'}</p>", unsafe_allow_html=True)
 
@@ -1637,8 +1427,8 @@ elif st.session_state.current_page == "game":
                          sets = st.session_state.player_sets_won.get(player, 0)
                          st.markdown(f"""
                              <div style='text-align: left; font-size: 1.2em; padding-top: 5px;'>
-                                 📊{t('avg_short')}: {avg_3_dart:.2f}<br>
-                                 🦵{t('legs_short')}: {legs} | 🏆{t('sets_short')}: {sets}
+                                 📊{'avg_short'}: {avg_3_dart:.2f}<br>
+                                 🦵{'legs_short'}: {legs} | 🏆{'sets_short'}: {sets}
                              </div>
                              """, unsafe_allow_html=True)
 
@@ -1647,7 +1437,7 @@ elif st.session_state.current_page == "game":
                          last_turn_str = " ".join(map(str, last_shots)) if last_shots else "-"
                          last_turn_total, _, _, _ = calculate_turn_total(last_shots) if last_shots else (0,0,False, [])
                          last_turn_total_val = last_turn_total if last_turn_total is not None else 0
-                         st.markdown(f"<p style='text-align: left; font-size: 0.8em; color: grey; margin-bottom: 2px;'>{t('last_turn_short')}: {last_turn_str} ({last_turn_total_val})</p>", unsafe_allow_html=True)
+                         st.markdown(f"<p style='text-align: left; font-size: 0.8em; color: grey; margin-bottom: 2px;'>{'last_turn_short'}: {last_turn_str} ({last_turn_total_val})</p>", unsafe_allow_html=True)
 
 
                          # --- Checkout / Setup Suggestions ---
@@ -1669,7 +1459,7 @@ elif st.session_state.current_page == "game":
                                      if darts_left_disp >= 1 and score_remaining_now_disp <= 50 and score_remaining_now_disp not in BOGIE_NUMBERS_SET:
                                          checkouts_1 = get_checkouts(score_remaining_now_disp, 1)
                                          if checkouts_1:
-                                             suggestion_html = f"<p style='font-size: 0.9em; color: #006400; font-weight: bold; margin: 5px 0 0 0;'>{t('out_suggestion')} {checkouts_1[0][0]} {t('one_dart_suffix')}</p>"
+                                             suggestion_html = f"<p style='font-size: 0.9em; color: #006400; font-weight: bold; margin: 5px 0 0 0;'>{'out_suggestion'} {checkouts_1[0][0]} {'one_dart_suffix'}</p>"
                                              found_suggestion = True
 
                                      # 2. Check for 2-Dart Finish
@@ -1681,7 +1471,7 @@ elif st.session_state.current_page == "game":
                                              preferred_doubles_set = set(player_prefs_list) if player_prefs_list else DEFAULT_PREFERRED_DOUBLES
                                              sorted_suggestions = sort_checkouts_by_preference(checkouts_2, preferred_doubles_set)
                                              display_text = " | ".join([" → ".join(path) for path in sorted_suggestions[:2]]) # Show top 2, use arrow
-                                             suggestion_html = f"<p style='font-size: 0.9em; color: green; margin: 5px 0 0 0;'>{t('out_suggestion')} {display_text} {t('two_dart_suffix')}</p>"
+                                             suggestion_html = f"<p style='font-size: 0.9em; color: green; margin: 5px 0 0 0;'>Suggested Checkout: {display_text} {'two_dart_suffix'}</p>"
                                              found_suggestion = True
 
                                      # 3. Check for 3-Dart Finish
@@ -1693,7 +1483,7 @@ elif st.session_state.current_page == "game":
                                              preferred_doubles_set = set(player_prefs_list) if player_prefs_list else DEFAULT_PREFERRED_DOUBLES
                                              sorted_suggestions = sort_checkouts_by_preference(checkouts_3, preferred_doubles_set)
                                              display_text = " | ".join([" → ".join(path) for path in sorted_suggestions[:2]]) # Show top 2, use arrow
-                                             suggestion_html = f"<p style='font-size: 0.9em; color: darkgreen; margin: 5px 0 0 0;'>{t('out_suggestion')} {display_text} {t('three_dart_suffix')}</p>"
+                                             suggestion_html = f"<p style='font-size: 0.9em; color: darkgreen; margin: 5px 0 0 0;'>{'out_suggestion'} {display_text} {'three_dart_suffix'}</p>"
                                              found_suggestion = True
 
                                      # --- MODIFIED: Only suggest setup if score <= 170 ---
@@ -1701,12 +1491,12 @@ elif st.session_state.current_page == "game":
                                      if not found_suggestion and darts_left_disp == 1 and 1 < score_remaining_now_disp <= 170 and score_remaining_now_disp not in BOGIE_NUMBERS_SET:
                                          setup_suggestion = get_setup_shot(score_remaining_now_disp)
                                          if setup_suggestion:
-                                             suggestion_html = f"<p style='font-size: 0.9em; color: orange; margin: 5px 0 0 0;'>{t('setup_suggestion')} {setup_suggestion}</p>"
+                                             suggestion_html = f"<p style='font-size: 0.9em; color: orange; margin: 5px 0 0 0;'>{'setup_suggestion'} {setup_suggestion}</p>"
                                              found_suggestion = True
 
                                      # 5. Handle Bogie Numbers
                                      if not found_suggestion and score_remaining_now_disp in BOGIE_NUMBERS_SET:
-                                          suggestion_html = f"<p style='font-size: 0.8em; color: red; margin: 5px 0 0 0;'>{t('no_checkout_bogie')}</p>"
+                                          suggestion_html = f"<p style='font-size: 0.8em; color: red; margin: 5px 0 0 0;'>{'no_checkout_bogie'}</p>"
                                           found_suggestion = True
 
                          # Display the suggestion HTML or a placeholder for alignment
@@ -1716,7 +1506,7 @@ elif st.session_state.current_page == "game":
                     st.markdown("</div>", unsafe_allow_html=True) # Close player container div
 
         else:
-            st.warning(t("no_players_in_game_warning")) # Should not happen if check at start works
+            st.warning("no_players_in_game_warning") # Should not happen if check at start works
 
 
     with right_col:
@@ -1728,18 +1518,18 @@ elif st.session_state.current_page == "game":
                  current_player_index_input_safe = st.session_state.current_player_index % len(st.session_state.players_selected_for_game)
                  current_player_name_input = st.session_state.players_selected_for_game[current_player_index_input_safe]
 
-            st.markdown(f"**{t('enter_score_for')} {current_player_name_input}**")
+            st.markdown(f"**{'enter_score_for'} {current_player_name_input}**")
 
             # Display current shots entered for the turn
             modifier_indicator = ""
             if st.session_state.pending_modifier == "D":
-                 modifier_indicator = f" {t('double_indicator')}"
+                 modifier_indicator = f" {'double_indicator'}"
             elif st.session_state.pending_modifier == "T":
-                 modifier_indicator = f" {t('triple_indicator')}"
-            st.markdown(f"**{t('input_indicator')}** `{ ' | '.join(st.session_state.current_turn_shots) }`{modifier_indicator}")
+                 modifier_indicator = f" {'triple_indicator'}"
+            st.markdown(f"**{'input_indicator'}** `{ ' | '.join(st.session_state.current_turn_shots) }`{modifier_indicator}")
 
             num_darts_entered = len(st.session_state.current_turn_shots)
-            st.caption(f"{t('dart')} {num_darts_entered + 1} / 3")
+            st.caption(f"{'dart'} {num_darts_entered + 1} / 3")
             input_disabled = num_darts_entered >= 3 # Disable input after 3 darts
 
             # --- Input Buttons ---
@@ -1762,21 +1552,21 @@ elif st.session_state.current_page == "game":
             # Action Buttons (Double, Triple, Back, Undo)
             cols_action = st.columns(4)
             double_btn_type = "primary" if st.session_state.pending_modifier == "D" else "secondary"
-            if cols_action[0].button(f"D", key="pad_btn_D", help=t('set_double'), use_container_width=True, type=double_btn_type, disabled=input_disabled):
+            if cols_action[0].button(f"D", key="pad_btn_D", help=('set_double'), use_container_width=True, type=double_btn_type, disabled=input_disabled):
                 st.session_state.pending_modifier = None if st.session_state.pending_modifier == "D" else "D"
                 st.rerun()
             triple_btn_type = "primary" if st.session_state.pending_modifier == "T" else "secondary"
-            if cols_action[1].button(f"T", key="pad_btn_T", help=t('set_triple'), use_container_width=True, type=triple_btn_type, disabled=input_disabled):
+            if cols_action[1].button(f"T", key="pad_btn_T", help=('set_triple'), use_container_width=True, type=triple_btn_type, disabled=input_disabled):
                 st.session_state.pending_modifier = None if st.session_state.pending_modifier == "T" else "T"
                 st.rerun()
-            if cols_action[2].button(f"⬅️", key="pad_btn_back", help=t('remove_last'), use_container_width=True): # Simpler Back icon
+            if cols_action[2].button(f"⬅️", key="pad_btn_back", help=('remove_last'), use_container_width=True): # Simpler Back icon
                 if st.session_state.pending_modifier: # Clear modifier first
                     st.session_state.pending_modifier = None
                 elif st.session_state.current_turn_shots: # Remove last shot if no modifier pending
                     st.session_state.current_turn_shots.pop()
                 st.rerun()
             can_undo = st.session_state.get("state_before_last_turn") is not None # Check if undo state exists
-            if cols_action[3].button(f"↩️", key="pad_btn_undo", help=t('undo_last_turn'), use_container_width=True, disabled=not can_undo): # Simpler Undo icon
+            if cols_action[3].button(f"↩️", key="pad_btn_undo", help=('undo_last_turn'), use_container_width=True, disabled=not can_undo): # Simpler Undo icon
                 if st.session_state.state_before_last_turn:
                     state = st.session_state.state_before_last_turn
                     undo_player_name = state["player_name"]
@@ -1805,12 +1595,12 @@ elif st.session_state.current_page == "game":
                     st.session_state.game_over = False
                     st.session_state.winner = None
                     st.session_state.pending_modifier = None # Clear any pending D/T
-                    st.session_state.message = t("toast_undid_turn") # Provide feedback
+                    st.session_state.message = ("toast_undid_turn") # Provide feedback
 
                     st.session_state.state_before_last_turn = None # Consume undo state - can only undo once per turn
                     st.rerun()
                 else:
-                    st.warning(t("toast_nothing_to_undo")) # Should be disabled, but good fallback
+                    st.warning("toast_nothing_to_undo") # Should be disabled, but good fallback
 
             st.markdown("<div style='margin-top: 8px;'></div>", unsafe_allow_html=True) # Space before number pad
 
@@ -1825,7 +1615,7 @@ elif st.session_state.current_page == "game":
                     if i < len(cols): # Ensure we don't try to access non-existent column
                         num_str = str(num_val)
                         is_miss_button = (num_val == 0)
-                        button_text = t('miss') if is_miss_button else num_str
+                        button_text = ('miss') if is_miss_button else num_str
                         # Use unique key for each button based on its value
                         if cols[i].button(button_text, key=f"pad_btn_num_{num_val}", use_container_width=True, disabled=input_disabled):
                             # Process number press only if less than 3 darts thrown
@@ -1837,12 +1627,12 @@ elif st.session_state.current_page == "game":
                                 # Apply modifier if active and valid for the number
                                 if modifier == "T":
                                     if num_val <= 0 or num_val > 20:
-                                        st.toast(t("toast_invalid_modifier_T"), icon="⚠️")
+                                        st.toast("toast_invalid_modifier_T", icon="⚠️")
                                         valid_combination = False
                                     else: final_shot_str = "T" + num_str
                                 elif modifier == "D":
                                     if num_val <= 0 or (num_val > 20 and num_val != 25):
-                                        st.toast(t("toast_invalid_modifier_D"), icon="⚠️")
+                                        st.toast("toast_invalid_modifier_D", icon="⚠️")
                                         valid_combination = False
                                     else: final_shot_str = "D" + num_str
 
@@ -1884,7 +1674,7 @@ elif st.session_state.current_page == "game":
             st.markdown("---") # Separator at end of input area
 
         else: # If game is over (should be caught earlier, but safe fallback)
-            st.info(t('game_over_start_new'))
+            st.info('game_over_start_new')
 
         # Display toast messages if any
         if st.session_state.message:
@@ -1894,7 +1684,7 @@ elif st.session_state.current_page == "game":
 
 # --- Fallback for Unknown Page State (if logged in but page invalid) ---
 elif st.session_state.logged_in:
-     st.warning(t('invalid_page_state'))
+     st.warning('invalid_page_state')
      st.info("Redirecting to Homepage...")
      st.session_state.current_page = page_map.get("Homepage", "homepage")
      st.session_state.nav_target = reverse_page_map.get("homepage", "Homepage")

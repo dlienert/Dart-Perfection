@@ -2,10 +2,89 @@
     "Masayasu": {
         "password": "660bb9c5e8aff270dff00e6feb7dff2bdb6cea76c063c24ec3802819be2caa56",
         "games": [],
-        "player_stats": {},
-        "checkout_log": [],
+        "player_stats": {
+            "Erik": {
+                "games_played": 1,
+                "games_won": 1,
+                "legs_won": 1,
+                "sets_won": 1,
+                "total_score": 301,
+                "highest_score": 126,
+                "total_turns": 3,
+                "num_busts": 0,
+                "darts_thrown": 9,
+                "preferred_doubles": [],
+                "avatar": "\ud83c\udfaf",
+                "avatar_url": "https://api.dicebear.com/8.x/initials/svg?seed=Erik"
+            },
+            "Masayasu": {
+                "games_played": 2,
+                "games_won": 2,
+                "legs_won": 2,
+                "sets_won": 2,
+                "total_score": 802,
+                "highest_score": 180,
+                "total_turns": 7,
+                "num_busts": 0,
+                "darts_thrown": 19,
+                "preferred_doubles": [],
+                "avatar": "\ud83c\udfaf",
+                "avatar_url": "https://api.dicebear.com/8.x/initials/svg?seed=Masayasu"
+            }
+        },
+        "checkout_log": [
+            {
+                "timestamp": "2025-04-16 11:51:53",
+                "player": "Masayasu",
+                "score_before": 120,
+                "shots": [
+                    "T20",
+                    "D20",
+                    "D10"
+                ],
+                "calculated_score": 120,
+                "result": "WIN",
+                "last_dart_was_double": true,
+                "last_dart_str": "D10",
+                "game_mode": 501,
+                "leg": 1,
+                "set": 1
+            },
+            {
+                "timestamp": "2025-04-16 11:53:02",
+                "player": "Masayasu",
+                "score_before": 16,
+                "shots": [
+                    "D8"
+                ],
+                "calculated_score": 16,
+                "result": "WIN",
+                "last_dart_was_double": true,
+                "last_dart_str": "D8",
+                "game_mode": 301,
+                "leg": 1,
+                "set": 1
+            },
+            {
+                "timestamp": "2025-04-16 11:54:02",
+                "player": "Erik",
+                "score_before": 126,
+                "shots": [
+                    "T20",
+                    "T18",
+                    "D6"
+                ],
+                "calculated_score": 126,
+                "result": "WIN",
+                "last_dart_was_double": true,
+                "last_dart_str": "D6",
+                "game_mode": 301,
+                "leg": 1,
+                "set": 1
+            }
+        ],
         "preferred_doubles": [],
-        "avatar_choice": "avataaars_hero1"
+        "avatar_choice": "pixel-art_Bullseye"
     },
     "dlienert": {
         "password": "e5db055d65faa97d8fdaaf6f31d437f31354fe3b4ac239a2cf25bdb1c32bf936",
